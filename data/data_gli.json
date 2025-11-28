@@ -182,30 +182,6 @@
         {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
       ]
     },
-    "guardHiPre": {
-      "loop": true,
-      "loopStart": 1,
-      "frames": [
-        { "image": "chr_gli/gli_guardHi_000.png", "duration": 3, "offset": [0,13] },
-        { "image": "chr_gli/gli_guardHi_001.png", "duration": 3, "offset": [0,13] }
-      ],
-      "defaultBoxes": [
-        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
-        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
-      ]
-    },
-    "guardLoPre": {
-      "loop": true,
-      "loopStart": 1,
-      "frames": [
-        { "image": "chr_gli/gli_guardLo_000.png", "duration": 3, "offset": [0,13] },
-        { "image": "chr_gli/gli_guardLo_001.png", "duration": 3, "offset": [0,13] }
-      ],
-      "defaultBoxes": [
-        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
-        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
-      ]
-    },
     "guardHi": {
       "loop": false,
       "frames": [
@@ -217,7 +193,7 @@
       ]
     },
     "guardLo": {
-      "loop": false,
+      "loop": true,
       "frames": [
         { "image": "chr_gli/gli_guardLo_002.png", "duration": 3, "offset": [0,13] }
       ],
@@ -227,9 +203,10 @@
       ]
     },
     "guardHiPost": {
-      "loop": false,
+      "loop": true,
       "frames": [
-        { "image": "chr_gli/gli_guardHi_001.png", "duration": 3, "offset": [0,13] }
+        { "image": "chr_gli/gli_guardHi_001.png", "duration": 3, "offset": [0,13] },
+        { "image": "chr_gli/gli_guardHi_000.png", "duration": 3, "offset": [0,13] }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
@@ -237,9 +214,10 @@
       ]
     },
     "guardLoPost": {
-      "loop": false,
+      "loop": true,
       "frames": [
-        { "image": "chr_gli/gli_guardLo_001.png", "duration": 3, "offset": [0,13] }
+        { "image": "chr_gli/gli_guardLo_001.png", "duration": 3, "offset": [0,13] },
+        { "image": "chr_gli/gli_guardLo_000.png", "duration": 3, "offset": [0,13] }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},

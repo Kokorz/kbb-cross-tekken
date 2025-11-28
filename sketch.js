@@ -332,76 +332,45 @@ function checkHits(attacker, defender) {
   const hitboxes = attacker.hitboxes;
   const hurtboxes = defender.hurtboxes;
 
-  //  PROXIMITY: compute attacker's horizontal hitbox span and a threshold (max reach * 1.1)
-  let minEdge = Infinity;
-  let maxEdge = -Infinity;
-  for (const h of hitboxes) {
-    if (!h || h.w === 0 || h.h === 0) continue;
-    const left = Math.min(h.x, h.x + h.w);
-    const right = Math.max(h.x, h.x + h.w);
-    if (left < minEdge) minEdge = left;
-    if (right > maxEdge) maxEdge = right;
-  }
-
-  // If attacker has no active hitboxes, bail out early
-  if (minEdge === Infinity) return;
-
-  const maxReachFromAttacker = Math.max(
-    Math.abs(minEdge - attacker.sprite.x),
-    Math.abs(maxEdge - attacker.sprite.x)
-  );
-  const proximityThreshold = maxReachFromAttacker * 1.1;
-  const actualDist = Math.abs(defender.sprite.x - attacker.sprite.x);
-  const withinProximity = actualDist <= proximityThreshold;
-
   for (const hit of hitboxes) {
-    if (hit.w === 0 || hit.h === 0) continue;
+    if (!hit || hit.w === 0 || hit.h === 0) continue;
 
     for (const hurt of hurtboxes) {
-      if (hurt.w === 0 || hurt.h === 0) continue;
+      if (!hurt || hurt.w === 0 || hurt.h === 0) continue;
 
       if (!rectOverlap(hit, hurt)) continue;
 
-      
-      // 1. Tekken high whiff rule (must be checked before calling takeHit/takeBlock)
-      
-      // High attacks completely whiff against crouching non-guard defenders
-      if (guardFlag === "High" && defender.isCrouching && !defender.isGuarding) {
+      // ----------------------------------------------------------
+      // 1. Tekken High Whiff Rule
+      //    A standing High attack whiffs on a crouching defender
+      //    IF they are not attempting to guard.
+      // ----------------------------------------------------------
+      if (guardFlag === "High" && defender.isCrouching && 
+          !defender.isHoldingBack() && !defender.isHoldingDownBack()) {
         return;
       }
 
-      
-      // 2. Determine if this is a block
-      //    NOTE: require the defender both be in a guarding input and be *nearby*
-      
-      let isBlock = false;
+      // ----------------------------------------------------------
+      // 2. Determine if defender is *attempting* to block (via input)
+      //    No proximity. No isGuarding flag. Pure input logic.
+      // ----------------------------------------------------------
+      const wantsToBlock =
+        defender.isHoldingBack() || defender.isHoldingDownBack();
 
-      if (defender.isGuarding && withinProximity) {
-        // Standing guard blocks High + Mid
-        if (
-          (guardFlag === "High" || guardFlag === "Mid") &&
-          defender.isStandingGuard
-        ) {
-          isBlock = true;
-        }
-        // Crouch guard blocks Low
-        else if (guardFlag === "Low" && defender.isCrouchGuard) {
-          isBlock = true;
-        }
-      }
+      // ----------------------------------------------------------
+      // 3. Apply block or hit.
+      //    takeBlock will internally decide correct/incorrect block.
+      // ----------------------------------------------------------
 
-      
-      // 3. Apply block or hit reaction
-      
-      if (isBlock) {
+      if (wantsToBlock) {
         defender.takeBlock(attacker, { movedata: currentMD });
       } else {
         defender.takeHit(attacker, { movedata: currentMD });
       }
 
-      
-      // 4. Prevent repeat hits for this movedata
-      
+      // ----------------------------------------------------------
+      // 4. Prevent repeat hits for this sequence
+      // ----------------------------------------------------------
       attacker.canHitThisSequence = false;
       attacker.lastHitMoveData = currentMD;
 
@@ -409,6 +378,7 @@ function checkHits(attacker, defender) {
     }
   }
 }
+
 
 
 function resolvePush(p1, p2) {

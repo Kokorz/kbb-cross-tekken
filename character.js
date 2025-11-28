@@ -391,7 +391,7 @@ class Character {
     draw(this.hitboxes, [255, 0, 0, 64], [255, 0, 0]);
   }
 
-  takeHit(attacker, hitboxData) {
+  takeHit(attacker) {
     const md = attacker.getCurrentMoveData();
     if (!md) return; // safety fallback
 
@@ -422,25 +422,29 @@ class Character {
     this.changeState("hitstun");
   }
 
-  takeBlock(attacker, data) {
-    const md = data.movedata;
+  takeBlock(attacker, { movedata }) {
 
-    // Small pause for block, not hitpause
-    globalHitPause = md.block_pause || 0;
+    const gf = movedata.guard_flag;
 
-    // Apply blockstun
-    this.blockStunTimer = md.block_stun || 0;
+    const isStandingInput = this.isHoldingBack();
+    const isCrouchingInput = this.isHoldingDownBack();
 
-    // Apply block knockback
-    this.knockback = {
-      x: (md.block_knockback && md.block_knockback[0]) || 0,
-      y: (md.block_knockback && md.block_knockback[1]) || 0,
-    };
-    this.knockbackApplied = false;
+    let blockCorrect = false;
+
+    if (isStandingInput && (gf === "High" || gf === "Mid")) blockCorrect = true;
+    if (isCrouchingInput && (gf === "Low")) blockCorrect = true;
+
+    if (!blockCorrect) {
+      this.takeHit(attacker, { movedata });
+      return;
+    }
+
+    // Store stun data for blockstun state to read
+    this._pendingBlockStunTimer = movedata.block_stun;
+    this._pendingBlockKnockback = movedata.block_knockback || [0,0] ;
 
     this.changeState("blockstun");
   }
-
 
   handleButtonTaps() {
     const buttons = ["lp", "rp", "lk", "rk"];
@@ -454,92 +458,10 @@ class Character {
     });
   }
 
-  isAttackThreatening() {
-    const opp = this.opponent;
-    if (!opp) return false;
-
-    const md = opp.getCurrentMoveData();
-    if (!md) return false;
-
-    // Must have active hitboxes
-    const hitboxes = opp.hitboxes;
-    const hurtboxes = this.hurtboxes;
-
-    if (!hitboxes || !hurtboxes) return false;
-
-    // Guard flag determines whether guarding is even possible
-    const guardFlag = md.guard_flag; // "High", "Mid", "Low"
-
-    // Check hitboxes against hurtboxes using your global rectOverlap()
-    for (const hit of hitboxes) {
-      if (!hit || hit.w === 0 || hit.h === 0) continue;
-
-      for (const hurt of hurtboxes) {
-        if (!hurt || hurt.w === 0 || hurt.h === 0) continue;
-
-        // Normal overlap check
-        if (rectOverlap(hit, hurt)) {
-          // If high attacks whiff crouchers (Tekken rule)
-          if (guardFlag === "High" && this.isCrouching) {
-            return false;
-          }
-          return true;
-        }
-
-        // Optional: threat buffer (small forward danger zone)
-        const bufferedHurt = {
-          x: hurt.x - 6,
-          y: hurt.y - 6,
-          w: hurt.w + 12,
-          h: hurt.h + 12
-        };
-
-        if (rectOverlap(hit, bufferedHurt)) {
-          if (guardFlag === "High" && this.isCrouching) {
-            return false;
-          }
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
-
-  checkForAutoGuard() {
-    if (!this.opponent) return;
-
-    // If already guarding or in guard stun, do nothing
-    if (this.state.startsWith("guard")) return;
-    if (this.state === "blockstun") return;
-
-    // Must be holding back
-    if (!this.isHoldingBack()) return;
-
-    const opp = this.opponent;
-    const md = opp.getCurrentMoveData();
-    if (!md) return;
-
-    // Opponent must be allowed to hit during this sequence
-    if (!opp.canHitThisSequence) return;
-
-    // Next: check if the attack is actually hitting this frame
-    if (!this.isAttackThreatening(opp, md)) return;
-
-    // Determine high or low guard
-    const isLow = md.attack_height === "low";
-    const stateName = isLow ? "guardPreLo" : "guardPreHi";
-
-    this.changeState(stateName);
-  }
-
-
   updateLogic() {
     this.handleInput();
     this.updateFacing();
     this.updateBoxes();
-    this.checkForAutoGuard();
     this.handleStandardStates();
     if (this[`state_${this.state}`]) this[`state_${this.state}`]();
     this.sprite.x = floor(this.sprite.x);
@@ -568,20 +490,6 @@ class Character {
         }
 
         this.advanceFrame();
-
-        if (this.isAttackThreatening()) {
-          // Guard check: stand guard
-          if (this.isHoldingBack() && !keyIsDown(this.keybindings.down)) {
-            this.changeState("guardPreHi");
-            return;
-          }
-
-          // Guard check: crouch guard
-          if (this.isHoldingBack() && keyIsDown(this.keybindings.down)) {
-            this.changeState("guardPreLo");
-            return;
-          }
-        }
 
         // Move to crouch
         if (keyIsDown(this.keybindings.down)) {
@@ -626,20 +534,6 @@ class Character {
         }
 
         this.advanceFrame();
-
-        if (this.isAttackThreatening()) {
-          // Guard check: stand guard
-          if (this.isHoldingBack() && !keyIsDown(this.keybindings.down)) {
-            this.changeState("guardPreHi");
-            return;
-          }
-
-          // Guard check: crouch guard
-          if (this.isHoldingBack() && keyIsDown(this.keybindings.down)) {
-            this.changeState("guardPreLo");
-            return;
-          }
-        }
 
         if (!keyIsDown(this.keybindings.down)) {
           this.changeState("idle");
@@ -798,32 +692,6 @@ class Character {
         if (this.frameIndex >= landAnim.frames.length - 1) this.changeState("idle");
         break;
 
-      case "guardPreHi":
-        if (this.justEnteredState) {
-          this.setAnim("guardHiPre");
-          this.frameIndex = 0;
-          this.frameTimer = 0;
-          this.isGuarding = true;
-          this.isStandingGuard = true;
-          this.isCrouchGuard = false;
-          this.justEnteredState = false;
-        }
-
-        this.advanceFrame();
-
-        // If player keeps holding back → enter full guard
-        const gph = this.anims.guardHiPre;
-        if (this.frameIndex >= gph.frames.length - 1) {
-          this.changeState("guardHi");
-        }
-
-        // If they release block → exit animation
-        if (!this.isHoldingBack()) {
-          this.changeState("guardPostHi");
-          return;
-        }
-        break;
-
       case "guardHi":
         if (this.justEnteredState) {
           this.setAnim("guardHi");
@@ -840,11 +708,6 @@ class Character {
           return;
         }
 
-        // If crouch is pressed → switch to low guard
-        if (keyIsDown(this.keybindings.down)) {
-          this.changeState("guardPreLo");
-          return;
-        }
         break;
 
       case "guardPostHi":
@@ -859,36 +722,8 @@ class Character {
 
         const hiPostA = this.anims.guardHiPost;
         if (this.frameIndex >= hiPostA.frames.length - 1) {
-          this.isGuarding = false;
-          this.isStandingGuard = false;
           if (keyIsDown(this.keybindings.down)) this.changeState("crouch");
           else this.changeState("idle");
-        }
-        break;
-
-      // LOW GUARD 
-
-      case "guardPreLo":
-        if (this.justEnteredState) {
-          this.setAnim("guardLoPre");
-          this.isGuarding = true;
-          this.isCrouchGuard = true;
-          this.isStandingGuard = false;
-          this.frameIndex = 0;
-          this.frameTimer = 0;
-          this.justEnteredState = false;
-        }
-
-        this.advanceFrame();
-
-        const glp = this.anims.guardLoPre;
-        if (this.frameIndex >= glp.frames.length - 1) {
-          this.changeState("guardLo");
-        }
-
-        if (!this.isHoldingDownBack()) {
-          this.changeState("guardPostLo");
-          return;
         }
         break;
 
@@ -908,12 +743,6 @@ class Character {
           return;
         }
 
-
-        // If standing input → switch to high guard
-        if (!keyIsDown(this.keybindings.down)) {
-          this.changeState("guardPreHigh");
-          return;
-        }
         break;
 
       case "guardPostLo":
@@ -928,34 +757,51 @@ class Character {
 
         const loPostA = this.anims.guardLoPost;
         if (this.frameIndex >= loPostA.frames.length - 1) {
-          this.isGuarding = false;
-          this.isCrouchGuard = false;
           if (keyIsDown(this.keybindings.down)) this.changeState("crouch");
           else this.changeState("idle");
         }
         break;
 
       case "blockstun":
-        // Freeze during block pause (shared with hitstop)
-        if (typeof globalHitPause !== "undefined" && globalHitPause > 0) return;
+        // 1. Initialization
+        if (this.justEnteredState) {
+          // Choose correct block animation
+          if (this.isHoldingDownBack()) {
+            this.setAnim("guardLo");
+          } else {
+            this.setAnim("guardHi");
+          }
 
+          // Initialize stun/knockback (saved earlier by takeBlock)
+          this.blockStunTimer = this._pendingBlockStunTimer;
+          this.knockback = this._pendingBlockKnockback;
+          this.knockbackApplied = false;
+
+          this.justEnteredState = false;
+        }
+
+        // 2. Freeze during hitstop
+        if (globalHitPause > 0) return;
+
+        // 3. Knockback (first frame of stun)
         if (!this.knockbackApplied) {
           this.sprite.x += this.knockback.x * (this.facing === 1 ? 1 : -1);
           this.sprite.y += this.knockback.y;
           this.knockbackApplied = true;
         }
 
+        // 4. Run animation frames
+        this.advanceFrame();
+
+        // 5. Timer
         this.blockStunTimer--;
         if (this.blockStunTimer > 0) return;
 
-        // After blockstun ends, remain in guard as long as input is held
-        if (this.isHoldingDownBack()) {
-          this.changeState("guardLo");
-        } else if (this.isHoldingBack()) {
-          this.changeState("guardHi");
-        } else {
-          this.changeState("idle");
-        }
+        // 6. End of blockstun → guardPost transitions
+        if (this.isHoldingDownBack()) this.changeState("guardPostLo");
+        else if (this.isHoldingBack()) this.changeState("guardPostHi");
+        else this.changeState("guardPostHi");
+
         return;
 
 
