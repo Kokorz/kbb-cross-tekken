@@ -8978,7 +8978,7 @@ let p5playInit = function () {
 			case 'jsfiddle.net':
 			case 'codevre.com':
 			case 'preview.codevre.com':
-			case 'quintos-org.github.io':
+			case 'kokorz.github.io':
 				break;
 			default:
 				if (
