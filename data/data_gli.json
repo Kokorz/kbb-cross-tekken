@@ -1,0 +1,319 @@
+{
+  "name": "Glitch",
+  "shortname": "gli",
+  "defaultFacing": 1,
+  "defaultDuration": 6,
+  "animations": {
+    "idle": {
+      "loop": true,
+      "loopStart": 3,
+      "frames": [
+        { "image": "chr_gli/gli_idle_000.png", "duration": 2 },
+        { "image": "chr_gli/gli_idle_001.png", "duration": 2 },
+        { "image": "chr_gli/gli_idle_002.png", "duration": 92 },
+        { "image": "chr_gli/gli_idle_003.png", "duration": 3 },
+        { "image": "chr_gli/gli_idle_004.png", "duration": 3 },
+        { "image": "chr_gli/gli_idle_005.png", "duration": 3 },
+        { "image": "chr_gli/gli_idle_006.png", "duration": 120 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -30}
+      ]
+    },
+    "turn": {
+      "playOnce": true,
+      "frames": [
+        { "image": "chr_gli/gli003_00.png", "duration": 5 },
+        { "image": "chr_gli/gli003_01.png", "duration": 5 },
+        { "image": "chr_gli/gli003_02.png", "duration": 5 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -30}
+      ]
+    },
+    "staToCro": {
+      "playOnce": true,
+      "frames": [
+        { "image": "chr_gli/gli_statocro_000.png", "duration": 1, "offset": [5,0] }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -30}
+      ]
+    },
+    "croToSta": {
+      "playOnce": true,
+      "frames": [
+        { "image": "chr_gli/gli_crotosta_000.png", "duration": 5, "offset": [15,0] }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -30}
+      ]
+    },
+    "crouch": {
+      "loop": true,
+      "frames": [
+        { "image": "chr_gli/gli_crouch_001.png", "duration": 7 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -30}
+      ]
+    },
+    "crouchTurn": {
+      "playOnce": true,
+      "frames": [
+        { "image": "chr_gli/gli013_00.png", "duration": 5 },
+        { "image": "chr_gli/gli013_01.png", "duration": 5 },
+        { "image": "chr_gli/gli013_02.png", "duration": 5 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -30}
+      ]
+    },
+    "walkF": {
+      "loop": true,
+      "frames": [
+        { "image": "chr_gli/gli_walkF_000.png", "duration": 7},
+        { "image": "chr_gli/gli_walkF_001.png", "duration": 7},
+        { "image": "chr_gli/gli_walkF_002.png", "duration": 7},
+        { "image": "chr_gli/gli_walkF_003.png", "duration": 7},
+        { "image": "chr_gli/gli_walkF_004.png", "duration": 7},
+        { "image": "chr_gli/gli_walkF_005.png", "duration": 7},
+        { "image": "chr_gli/gli_walkF_006.png", "duration": 7},
+        { "image": "chr_gli/gli_walkF_007.png", "duration": 7},
+        { "image": "chr_gli/gli_walkF_008.png", "duration": 7}
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -30}
+      ]
+    },
+    "walkB": {
+      "loop": true,
+      "frames": [
+        { "image": "chr_gli/gli_walkB_000.png", "duration": 7},
+        { "image": "chr_gli/gli_walkB_001.png", "duration": 7},
+        { "image": "chr_gli/gli_walkB_002.png", "duration": 7},
+        { "image": "chr_gli/gli_walkB_003.png", "duration": 7},
+        { "image": "chr_gli/gli_walkB_004.png", "duration": 7},
+        { "image": "chr_gli/gli_walkB_005.png", "duration": 7},
+        { "image": "chr_gli/gli_walkB_006.png", "duration": 7},
+        { "image": "chr_gli/gli_walkB_007.png", "duration": 7},
+        { "image": "chr_gli/gli_walkB_008.png", "duration": 7}
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -30}
+      ]
+    },
+    "run": {
+      "loop": true,
+      "loopStart": 3,
+      "frames": [
+        { "image": "chr_gli/gli_run_000.png", "duration": 4 },
+        { "image": "chr_gli/gli_run_001.png", "duration": 4 },
+        { "image": "chr_gli/gli_run_002.png", "duration": 4 },
+        { "image": "chr_gli/gli_run_003.png", "duration": 4 },
+        { "image": "chr_gli/gli_run_004.png", "duration": 4 },
+        { "image": "chr_gli/gli_run_005.png", "duration": 4 },
+        { "image": "chr_gli/gli_run_006.png", "duration": 4 },
+        { "image": "chr_gli/gli_run_007.png", "duration": 4 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -30}
+      ]
+    },
+    "runStop": {
+      "playOnce": true,
+      "frames": [
+        { "image": "chr_gli/gli_jumpstart_000.png", "duration": 1 },
+        { "image": "chr_gli/gli_jumpstart_000.png", "duration": 1 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -30}
+      ]
+    },
+    "prejump": {
+      "loop": false,
+      "frames": [
+        { "image": "chr_gli/gli_jumpstart_000.png", "duration": 3 },
+        { "image": "chr_gli/gli_jumpstart_000.png", "duration": 1 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "jump": {
+      "loop": false,
+      "frames": [
+        { "image": "chr_gli/gli_jump_000.png", "duration": 4 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "fall": {
+      "loop": true,
+      "frames": [
+        { "image": "chr_gli/gli_fall_000.png", "duration": 3 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "land": {
+      "loop": false,
+      "frames": [
+        { "image": "chr_gli/gli_jumpstart_000.png", "duration": 4 },
+        { "image": "chr_gli/gli_jumpstart_000.png", "duration": 1 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "guardHiPre": {
+      "loop": true,
+      "loopStart": 1,
+      "frames": [
+        { "image": "chr_gli/gli_guardHi_000.png", "duration": 3 },
+        { "image": "chr_gli/gli_guardHi_001.png", "duration": 3 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "guardLoPre": {
+      "loop": true,
+      "loopStart": 1,
+      "frames": [
+        { "image": "chr_gli/gli_guardLo_000.png", "duration": 3 },
+        { "image": "chr_gli/gli_guardLo_001.png", "duration": 3 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "guardHi": {
+      "loop": false,
+      "frames": [
+        { "image": "chr_gli/gli_guardHi_002.png", "duration": 3 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "guardLo": {
+      "loop": false,
+      "frames": [
+        { "image": "chr_gli/gli_guardLo_002.png", "duration": 3 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "guardHiPost": {
+      "loop": false,
+      "frames": [
+        { "image": "chr_gli/gli_guardHi_001.png", "duration": 3 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "guardLoPost": {
+      "loop": false,
+      "frames": [
+        { "image": "chr_gli/gli_guardLo_001.png", "duration": 3 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "hurtStandHi": {
+      "loop": true,
+      "loopStart": 3,
+      "frames": [
+        { "image": "chr_gli/gli_hurt_standHi_000.png", "duration": 3 },
+        { "image": "chr_gli/gli_hurt_standHi_001.png", "duration": 3 },
+        { "image": "chr_gli/gli_hurt_standHi_002.png", "duration": 3 },
+        { "image": "chr_gli/gli_hurt_standHi_003.png", "duration": 3 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -90, "y": 0, "w": 110, "h": -320},
+        {"type": "hurtbox", "x": -120, "y": 0, "w": 180, "h": -400}
+      ]
+    },
+    "hurtStandLo": {
+      "loop": true,
+      "loopStart": 3,
+      "frames": [
+        { "image": "chr_gli/gli_hurt_standLo_000.png", "duration": 3 },
+        { "image": "chr_gli/gli_hurt_standLo_001.png", "duration": 3 },
+        { "image": "chr_gli/gli_hurt_standLo_002.png", "duration": 3 },
+        { "image": "chr_gli/gli_hurt_standLo_003.png", "duration": 3 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -90, "y": 0, "w": 110, "h": -320},
+        {"type": "hurtbox", "x": -120, "y": 0, "w": 180, "h": -400}
+      ]
+    },
+    "hurtCrouch": {
+      "loop": true,
+      "loopStart": 3,
+      "frames": [
+        { "image": "chr_gli/gli_hurt_crouch_000.png", "duration": 3 },
+        { "image": "chr_gli/gli_hurt_crouch_001.png", "duration": 3 },
+        { "image": "chr_gli/gli_hurt_crouch_002.png", "duration": 3 },
+        { "image": "chr_gli/gli_hurt_crouch_003.png", "duration": 3 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -90, "y": 0, "w": 110, "h": -320},
+        {"type": "hurtbox", "x": -120, "y": 0, "w": 180, "h": -400}
+      ]
+    },
+    "hurtAirStun": {
+      "loop": true,
+      "loopStart": 1,
+      "frames": [
+        { "image": "chr_gli/gli_hurt_airN_000.png", "duration": 3 },
+        { "image": "chr_gli/gli_hurt_airN_001.png", "duration": 3 },
+        { "image": "chr_gli/gli_hurt_airN_002.png", "duration": 3 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -90, "y": 0, "w": 110, "h": -320},
+        {"type": "hurtbox", "x": -120, "y": 0, "w": 180, "h": -400}
+      ]
+    },
+    "hurtAirFall": {
+      "loop": true,
+      "loopStart": 2,
+      "frames": [
+        { "image": "chr_gli/gli_hurt_airN_003.png", "duration": 3 },
+        { "image": "chr_gli/gli_hurt_airN_004.png", "duration": 3 },
+        { "image": "chr_gli/gli_hurt_airN_005.png", "duration": 3 },
+        { "image": "chr_gli/gli_hurt_airN_006.png", "duration": 3 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -90, "y": 0, "w": 110, "h": -320},
+        {"type": "hurtbox", "x": -120, "y": 0, "w": 180, "h": -400}
+      ]
+    }
+  }
+}
