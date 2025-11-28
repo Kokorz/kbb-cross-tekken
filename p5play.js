@@ -8994,7 +8994,7 @@ let p5playInit = function () {
 				) {
 					break;
 				}
-				playIntro();
+				break;
 		}
 	}
 
