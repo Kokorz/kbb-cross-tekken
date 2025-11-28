@@ -133,7 +133,7 @@ function draw() {
 }
 
 function updateCamera() {
-  // --- Player distance for dynamic zoom ---
+  //  Player distance for dynamic zoom 
   const pDist = abs(p1.sprite.x - p2.sprite.x);
 
   const minDist = (width / 3) * 2;
@@ -147,10 +147,10 @@ function updateCamera() {
 
   const targetZoom = lerp(maxZoom, minZoom, t);
 
-  // --- Horizontal centering ---
+  //  Horizontal centering 
   const targetX = (p1.sprite.x + p2.sprite.x) * 0.5;
 
-  // --- Vertical centering with floor anchor ---
+  //  Vertical centering with floor anchor 
   const targetY_raw = (p1.sprite.y + p2.sprite.y) * 0.5 - 50;
 
   const floorY = gfloor.y;
@@ -163,18 +163,18 @@ function updateCamera() {
 
   const targetY = min(targetY_raw, targetY_floorAnchor);
 
-  // --- Lerp toward targets ---
+  //  Lerp toward targets 
   let camX = lerp(camera.x, targetX, 0.12);
   let camY = lerp(camera.y, targetY, 0.12);
   let camZoom = lerp(camera.zoom, targetZoom, 0.05);
 
-  // --- SNAP TO PIXEL GRID (critical for tiny sprites & pixel art) ---
+  //  SNAP TO PIXEL GRID
   const grid = 8; // because of displayMode scale = 8
   camX = round(camX * grid) / grid;
   camY = round(camY * grid) / grid;
   camZoom = round(camZoom * grid) / grid;
 
-  // --- Apply snapped values ---
+  //  Apply snapped values 
   camera.x = camX;
   camera.y = camY;
   camera.zoom = camZoom;
@@ -229,7 +229,7 @@ function drawInfiniteFloor() {
   }
 }
 
-// --- INPUT / MOTION ---
+//  INPUT / MOTION 
 function getCurrentDirection() {
   const up = keyIsDown(this.keybindings.up),
     down = keyIsDown(this.keybindings.down),
@@ -332,7 +332,7 @@ function checkHits(attacker, defender) {
   const hitboxes = attacker.hitboxes;
   const hurtboxes = defender.hurtboxes;
 
-  // --- PROXIMITY: compute attacker's horizontal hitbox span and a threshold (max reach * 1.1)
+  //  PROXIMITY: compute attacker's horizontal hitbox span and a threshold (max reach * 1.1)
   let minEdge = Infinity;
   let maxEdge = -Infinity;
   for (const h of hitboxes) {
@@ -362,18 +362,18 @@ function checkHits(attacker, defender) {
 
       if (!rectOverlap(hit, hurt)) continue;
 
-      // -------------------------------
+      
       // 1. Tekken high whiff rule (must be checked before calling takeHit/takeBlock)
-      // -------------------------------
+      
       // High attacks completely whiff against crouching non-guard defenders
       if (guardFlag === "High" && defender.isCrouching && !defender.isGuarding) {
         return;
       }
 
-      // -------------------------------
+      
       // 2. Determine if this is a block
       //    NOTE: require the defender both be in a guarding input and be *nearby*
-      // -------------------------------
+      
       let isBlock = false;
 
       if (defender.isGuarding && withinProximity) {
@@ -390,18 +390,18 @@ function checkHits(attacker, defender) {
         }
       }
 
-      // -------------------------------
+      
       // 3. Apply block or hit reaction
-      // -------------------------------
+      
       if (isBlock) {
         defender.takeBlock(attacker, { movedata: currentMD });
       } else {
         defender.takeHit(attacker, { movedata: currentMD });
       }
 
-      // -------------------------------
+      
       // 4. Prevent repeat hits for this movedata
-      // -------------------------------
+      
       attacker.canHitThisSequence = false;
       attacker.lastHitMoveData = currentMD;
 

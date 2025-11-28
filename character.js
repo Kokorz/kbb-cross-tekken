@@ -866,7 +866,7 @@ class Character {
         }
         break;
 
-      // LOW GUARD ---------------------------------------------------------------------
+      // LOW GUARD 
 
       case "guardPreLo":
         if (this.justEnteredState) {
@@ -992,13 +992,13 @@ class Character {
           this.justEnteredState = false;
         }
 
-        // --- SHARED HITSTOP (game freeze) ---
+        //  SHARED HITSTOP (game freeze) 
         // If globalHitPause is active, freeze here (no knockback application or frame advancement)
         if (typeof globalHitPause !== "undefined" && globalHitPause > 0) {
           return;
         }
 
-        // --- APPLY ONE-TIME KNOCKBACK (right after hitstop ends) ---
+        //  APPLY ONE-TIME KNOCKBACK (right after hitstop ends) 
         if (!this.knockbackApplied) {
           // apply immediate translation once
           this.sprite.x += this.knockback.x * (this.facing === 1 ? 1 : -1);
