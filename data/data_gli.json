@@ -186,8 +186,8 @@
       "loop": true,
       "loopStart": 1,
       "frames": [
-        { "image": "chr_gli/gli_guardHi_000.png", "duration": 3 },
-        { "image": "chr_gli/gli_guardHi_001.png", "duration": 3 }
+        { "image": "chr_gli/gli_guardHi_000.png", "duration": 3, "offset": [0,13] },
+        { "image": "chr_gli/gli_guardHi_001.png", "duration": 3, "offset": [0,13] }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
@@ -198,8 +198,8 @@
       "loop": true,
       "loopStart": 1,
       "frames": [
-        { "image": "chr_gli/gli_guardLo_000.png", "duration": 3 },
-        { "image": "chr_gli/gli_guardLo_001.png", "duration": 3 }
+        { "image": "chr_gli/gli_guardLo_000.png", "duration": 3, "offset": [0,13] },
+        { "image": "chr_gli/gli_guardLo_001.png", "duration": 3, "offset": [0,13] }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
@@ -209,7 +209,7 @@
     "guardHi": {
       "loop": false,
       "frames": [
-        { "image": "chr_gli/gli_guardHi_002.png", "duration": 3 }
+        { "image": "chr_gli/gli_guardHi_002.png", "duration": 3, "offset": [0,13] }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
@@ -219,7 +219,7 @@
     "guardLo": {
       "loop": false,
       "frames": [
-        { "image": "chr_gli/gli_guardLo_002.png", "duration": 3 }
+        { "image": "chr_gli/gli_guardLo_002.png", "duration": 3, "offset": [0,13] }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
@@ -229,7 +229,7 @@
     "guardHiPost": {
       "loop": false,
       "frames": [
-        { "image": "chr_gli/gli_guardHi_001.png", "duration": 3 }
+        { "image": "chr_gli/gli_guardHi_001.png", "duration": 3, "offset": [0,13] }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
@@ -239,7 +239,7 @@
     "guardLoPost": {
       "loop": false,
       "frames": [
-        { "image": "chr_gli/gli_guardLo_001.png", "duration": 3 }
+        { "image": "chr_gli/gli_guardLo_001.png", "duration": 3, "offset": [0,13] }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
@@ -250,10 +250,10 @@
       "loop": true,
       "loopStart": 3,
       "frames": [
-        { "image": "chr_gli/gli_hurt_standHi_000.png", "duration": 3 },
-        { "image": "chr_gli/gli_hurt_standHi_001.png", "duration": 3 },
-        { "image": "chr_gli/gli_hurt_standHi_002.png", "duration": 3 },
-        { "image": "chr_gli/gli_hurt_standHi_003.png", "duration": 3 }
+        { "image": "chr_gli/gli_hurt_standHi_000.png", "duration": 3, "offset": [8,16] },
+        { "image": "chr_gli/gli_hurt_standHi_001.png", "duration": 3, "offset": [8,16] },
+        { "image": "chr_gli/gli_hurt_standHi_002.png", "duration": 3, "offset": [8,16] },
+        { "image": "chr_gli/gli_hurt_standHi_003.png", "duration": 3, "offset": [8,16] }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -90, "y": 0, "w": 110, "h": -320},
@@ -264,10 +264,10 @@
       "loop": true,
       "loopStart": 3,
       "frames": [
-        { "image": "chr_gli/gli_hurt_standLo_000.png", "duration": 3 },
-        { "image": "chr_gli/gli_hurt_standLo_001.png", "duration": 3 },
-        { "image": "chr_gli/gli_hurt_standLo_002.png", "duration": 3 },
-        { "image": "chr_gli/gli_hurt_standLo_003.png", "duration": 3 }
+        { "image": "chr_gli/gli_hurt_standLo_000.png", "duration": 3, "offset": [8,16] },
+        { "image": "chr_gli/gli_hurt_standLo_001.png", "duration": 3, "offset": [8,16] },
+        { "image": "chr_gli/gli_hurt_standLo_002.png", "duration": 3, "offset": [8,16] },
+        { "image": "chr_gli/gli_hurt_standLo_003.png", "duration": 3, "offset": [8,16] }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -90, "y": 0, "w": 110, "h": -320},
@@ -278,10 +278,10 @@
       "loop": true,
       "loopStart": 3,
       "frames": [
-        { "image": "chr_gli/gli_hurt_crouch_000.png", "duration": 3 },
-        { "image": "chr_gli/gli_hurt_crouch_001.png", "duration": 3 },
-        { "image": "chr_gli/gli_hurt_crouch_002.png", "duration": 3 },
-        { "image": "chr_gli/gli_hurt_crouch_003.png", "duration": 3 }
+        { "image": "chr_gli/gli_hurt_crouch_000.png", "duration": 3, "offset": [8,16] },
+        { "image": "chr_gli/gli_hurt_crouch_001.png", "duration": 3, "offset": [8,16] },
+        { "image": "chr_gli/gli_hurt_crouch_002.png", "duration": 3, "offset": [8,16] },
+        { "image": "chr_gli/gli_hurt_crouch_003.png", "duration": 3, "offset": [8,16] }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -90, "y": 0, "w": 110, "h": -320},

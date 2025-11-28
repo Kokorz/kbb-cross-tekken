@@ -332,6 +332,28 @@ function checkHits(attacker, defender) {
   const hitboxes = attacker.hitboxes;
   const hurtboxes = defender.hurtboxes;
 
+  // --- PROXIMITY: compute attacker's horizontal hitbox span and a threshold (max reach * 1.1)
+  let minEdge = Infinity;
+  let maxEdge = -Infinity;
+  for (const h of hitboxes) {
+    if (!h || h.w === 0 || h.h === 0) continue;
+    const left = Math.min(h.x, h.x + h.w);
+    const right = Math.max(h.x, h.x + h.w);
+    if (left < minEdge) minEdge = left;
+    if (right > maxEdge) maxEdge = right;
+  }
+
+  // If attacker has no active hitboxes, bail out early
+  if (minEdge === Infinity) return;
+
+  const maxReachFromAttacker = Math.max(
+    Math.abs(minEdge - attacker.sprite.x),
+    Math.abs(maxEdge - attacker.sprite.x)
+  );
+  const proximityThreshold = maxReachFromAttacker * 1.1;
+  const actualDist = Math.abs(defender.sprite.x - attacker.sprite.x);
+  const withinProximity = actualDist <= proximityThreshold;
+
   for (const hit of hitboxes) {
     if (hit.w === 0 || hit.h === 0) continue;
 
@@ -341,23 +363,20 @@ function checkHits(attacker, defender) {
       if (!rectOverlap(hit, hurt)) continue;
 
       // -------------------------------
-      // 1. Tekken high whiff rule
+      // 1. Tekken high whiff rule (must be checked before calling takeHit/takeBlock)
       // -------------------------------
-      if (
-        guardFlag === "High" &&
-        defender.isCrouching &&
-        !defender.isGuarding
-      ) {
-        // High attacks completely whiff against crouching non-guard
+      // High attacks completely whiff against crouching non-guard defenders
+      if (guardFlag === "High" && defender.isCrouching && !defender.isGuarding) {
         return;
       }
 
       // -------------------------------
       // 2. Determine if this is a block
+      //    NOTE: require the defender both be in a guarding input and be *nearby*
       // -------------------------------
       let isBlock = false;
 
-      if (defender.isGuarding) {
+      if (defender.isGuarding && withinProximity) {
         // Standing guard blocks High + Mid
         if (
           (guardFlag === "High" || guardFlag === "Mid") &&
@@ -365,12 +384,8 @@ function checkHits(attacker, defender) {
         ) {
           isBlock = true;
         }
-
         // Crouch guard blocks Low
-        else if (
-          guardFlag === "Low" &&
-          defender.isCrouchGuard
-        ) {
+        else if (guardFlag === "Low" && defender.isCrouchGuard) {
           isBlock = true;
         }
       }
@@ -385,7 +400,7 @@ function checkHits(attacker, defender) {
       }
 
       // -------------------------------
-      // 4. Prevent repeat hits
+      // 4. Prevent repeat hits for this movedata
       // -------------------------------
       attacker.canHitThisSequence = false;
       attacker.lastHitMoveData = currentMD;
