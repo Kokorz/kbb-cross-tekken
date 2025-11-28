@@ -256,8 +256,8 @@
         { "image": "chr_gli/gli_hurt_standHi_003.png", "duration": 3, "offset": [8,16] }
       ],
       "defaultBoxes": [
-        {"type": "pushbox", "x": -90, "y": 0, "w": 110, "h": -320},
-        {"type": "hurtbox", "x": -120, "y": 0, "w": 180, "h": -400}
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
       ]
     },
     "hurtStandLo": {
@@ -270,8 +270,8 @@
         { "image": "chr_gli/gli_hurt_standLo_003.png", "duration": 3, "offset": [8,16] }
       ],
       "defaultBoxes": [
-        {"type": "pushbox", "x": -90, "y": 0, "w": 110, "h": -320},
-        {"type": "hurtbox", "x": -120, "y": 0, "w": 180, "h": -400}
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
       ]
     },
     "hurtCrouch": {
@@ -284,8 +284,8 @@
         { "image": "chr_gli/gli_hurt_crouch_003.png", "duration": 3, "offset": [8,16] }
       ],
       "defaultBoxes": [
-        {"type": "pushbox", "x": -90, "y": 0, "w": 110, "h": -320},
-        {"type": "hurtbox", "x": -120, "y": 0, "w": 180, "h": -400}
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
       ]
     },
     "hurtAirStun": {
