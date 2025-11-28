@@ -8921,81 +8921,58 @@ let p5playInit = function () {
 			sound.play();
 			sound.onended(() => resolve());
 		});
-	};
-
-	async function playIntro() {
-		if (document.getElementById('made-with-p5play')) return;
-		if (!using_p5v2) $._incrementPreload();
-		let d = document.createElement('div');
-		d.id = 'made-with-p5play';
-		d.style = 'position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 1000; background-color: black;';
-		let logo = document.createElement('img');
-		logo.style = `position: absolute; top: 50%; left: 50%; width: 80vmin; height: 40vmin; margin-left: -40vmin; margin-top: -20vmin; z-index: 1001; opacity: 1; scale: 1; transition: scale 1.5s, opacity 0.4s ease-in-out;`;
-		logo.onerror = () => {
-			logo.style.imageRendering = 'pixelated';
-			logo.src =
-				'data:image/png;base64,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';
 		};
-		let src = window._p5play_intro_image;
-		if (src == '' || src?.includes('made_with_p5play')) {
-			if (src.includes('bit.') || src.includes('pixel')) {
-				logo.style.imageRendering = 'pixelated';
-			}
-			logo.src = src;
-		} else {
-			logo.src = 'https://p5play.org/assets/made_with_p5play.webp';
-		}
-		await new Promise((r) => (logo.onload = r));
-		d.append(logo);
-		document.body.append(d);
-		await $.delay();
-		logo.offsetHeight; // trigger css reflow
-		logo.style.scale = 1.2;
-		await $.delay(1100);
-		logo.style.opacity = 0;
-		await $.delay(400);
-		d.style.display = 'none';
-		d.remove();
-		document.getElementById('made-with-p5play')?.remove();
-		if (!using_p5v2) $._decrementPreload();
-	}
-
-	if (window.location) {
-		let lh = location.hostname;
-		switch (lh) {
-			case '':
-			case '127.0.0.1':
-			case 'localhost':
-			case 'p5play.org':
-			case 'p5play-web.pages.dev':
-			case 'editor.p5js.org':
-			case 'codepen.io':
-			case 'aug4th.com':
-			case 'cdpn.io':
-			case 'glitch.com':
-			case 'replit.com':
-			case 'stackblitz.com':
-			case 'jsfiddle.net':
-			case 'codevre.com':
-			case 'preview.codevre.com':
-			case 'kokorz.github.io':
-				break;
-			default:
-				if (
-					/^[\d\.]+$/.test(lh) ||
-					lh.endsWith('.lan') ||
-					lh.endsWith('.local') ||
-					lh.endsWith('stackblitz.io') ||
-					lh.endsWith('glitch.me') ||
-					lh.endsWith('replit.dev') ||
-					lh.endsWith('codehs.com') ||
-					lh.endsWith('openprocessing.org') ||
-					location.origin.endsWith('preview.p5js.org')
-				) {
-					break;
-				}
-				break;
-		}
+	
+	async function playIntro() {
+	    if (document.getElementById('made-with-p5play')) return;
+	    if (!using_p5v2) $._incrementPreload();
+	
+	    // full-screen black overlay container
+	    let d = document.createElement('div');
+	    d.id = 'made-with-p5play';
+	    d.style = 'position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 1000; background-color: black;';
+	
+	    // create logo element but DO NOT assign a src at all
+	    let logo = document.createElement('img');
+	    logo.style = `
+	        position: absolute;
+	        top: 50%;
+	        left: 50%;
+	        width: 80vmin;
+	        height: 40vmin;
+	        margin-left: -40vmin;
+	        margin-top: -20vmin;
+	        z-index: 1001;
+	        opacity: 1;
+	        scale: 1;
+	        transition: scale 1.5s, opacity 0.4s ease-in-out;
+	    `;
+	
+	    // *** IMPORTANT ***
+	    // No src = literally blank. No loading. No branding.
+	    // Avoid onerror + avoid waiting for onload.
+	
+	    d.append(logo);
+	    document.body.append(d);
+	
+	    // retain original delay sequence
+	    await $.delay();
+	    logo.offsetHeight; // trigger CSS reflow
+	
+	    // scale animation (invisible but keeps timing intact)
+	    logo.style.scale = 1.2;
+	    await $.delay(1100);
+	
+	    // fade out the blank image area
+	    logo.style.opacity = 0;
+	    await $.delay(400);
+	
+	    // remove
+	    d.style.display = 'none';
+	    d.remove();
+	    document.getElementById('made-with-p5play')?.remove();
+	
+	    if (!using_p5v2) $._decrementPreload();
 	}
 
 	let didCreateCanvas = false;
