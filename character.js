@@ -383,20 +383,20 @@ class Character {
     if (this.health < 0) this.health = 0;
 
     // Shared hitstop (global freeze)
-    globalHitPause = md.hitpause || 0;
+    globalHitPause = md.hit_pause || 0;
 
     // Per-character hitstun
-    this.hitStunTimer = md.hitstun || 0;
+    this.hitStunTimer = md.hit_stun || 0;
 
     // Knockback (applies once after shared hitstop ends)
     this.knockback = {
-      x: (md.knockback && md.knockback[0]) || 0,
-      y: (md.knockback && md.knockback[1]) || 0,
+      x: (md.hit_knockback && md.hit_knockback[0]) || 0,
+      y: (md.hit_knockback && md.hit_knockback[1]) || 0,
     };
     this.knockbackApplied = false;
 
     // Store hint for choosing hurt anim
-    this.incomingHitAnimType = md.animtype || null;
+    this.incomingHitAnimType = md.hit_animtype_ground || null;
 
     // Prevent attacker from re-hitting this movedata until it changes
     attacker.canHitThisSequence = false;
@@ -404,6 +404,26 @@ class Character {
 
     this.changeState("hitstun");
   }
+
+  takeBlock(attacker, data) {
+    const md = data.movedata;
+
+    // Small pause for block, not hitpause
+    globalHitPause = md.block_pause || 0;
+
+    // Apply blockstun
+    this.blockStunTimer = md.block_stun || 0;
+
+    // Apply block knockback
+    this.knockback = {
+      x: (md.block_knockback && md.block_knockback[0]) || 0,
+      y: (md.block_knockback && md.block_knockback[1]) || 0,
+    };
+    this.knockbackApplied = false;
+
+    this.changeState("blockstun");
+  }
+
 
   handleButtonTaps() {
     const buttons = ["lp", "rp", "lk", "rk"];
@@ -650,6 +670,144 @@ class Character {
         const landAnim = this.anims.land;
         if (this.frameIndex >= landAnim.frames.length - 1) this.changeState("idle");
         break;
+
+      case "guardPreHi":
+        if (this.justEnteredState) {
+          this.setAnim("guardHiPre");
+          this.frameIndex = 0;
+          this.frameTimer = 0;
+          this.justEnteredState = false;
+        }
+
+        this.advanceFrame();
+
+        // If player keeps holding back → enter full guard
+        if (this.isHoldingBack()) {
+          this.changeState("guardHi");
+          return;
+        }
+
+        // If they release block → exit animation
+        if (!this.isHoldingBack()) {
+          this.changeState("guardPostHi");
+          return;
+        }
+        break;
+
+      case "guardHi":
+        if (this.justEnteredState) {
+          this.setAnim("guardHi");
+          this.frameIndex = 0;
+          this.frameTimer = 0;
+          this.justEnteredState = false;
+        }
+
+        this.advanceFrame();
+
+        // Still blocking?
+        if (!this.isHoldingBack()) {
+          this.changeState("guardPostHi");
+          return;
+        }
+        break;
+
+      case "guardPostHi":
+        if (this.justEnteredState) {
+          this.setAnim("guardHiPost");
+          this.frameIndex = 0;
+          this.frameTimer = 0;
+          this.justEnteredState = false;
+        }
+
+        this.advanceFrame();
+
+        const hiPostA = this.anims.guardHiPost;
+        if (this.frameIndex >= hiPostA.frames.length - 1) {
+          if (keyIsDown(this.keybindings.down)) this.changeState("crouch");
+          else this.changeState("idle");
+        }
+        break;
+
+      // LOW GUARD ---------------------------------------------------------------------
+
+      case "guardPreLo":
+        if (this.justEnteredState) {
+          this.setAnim("guardLoPre");
+          this.frameIndex = 0;
+          this.frameTimer = 0;
+          this.justEnteredState = false;
+        }
+
+        this.advanceFrame();
+
+        if (this.isHoldingDownBack()) {
+          this.changeState("guardLo");
+          return;
+        }
+
+        if (!this.isHoldingDownBack()) {
+          this.changeState("guardPostLo");
+          return;
+        }
+        break;
+
+      case "guardLo":
+        if (this.justEnteredState) {
+          this.setAnim("guardLo");
+          this.frameIndex = 0;
+          this.frameTimer = 0;
+          this.justEnteredState = false;
+        }
+
+        this.advanceFrame();
+
+        // Continue blocking?
+        if (!this.isHoldingDownBack()) {
+          this.changeState("guardPostLo");
+          return;
+        }
+        break;
+
+      case "guardPostLo":
+        if (this.justEnteredState) {
+          this.setAnim("guardLoPost");
+          this.frameIndex = 0;
+          this.frameTimer = 0;
+          this.justEnteredState = false;
+        }
+
+        this.advanceFrame();
+
+        const loPostA = this.anims.guardLoPost;
+        if (this.frameIndex >= loPostA.frames.length - 1) {
+          if (keyIsDown(this.keybindings.down)) this.changeState("crouch");
+          else this.changeState("idle");
+        }
+        break;
+
+      case "blockstun":
+        // Freeze during block pause (shared with hitstop)
+        if (typeof globalHitPause !== "undefined" && globalHitPause > 0) return;
+
+        if (!this.knockbackApplied) {
+          this.sprite.x += this.knockback.x * (this.facing === 1 ? 1 : -1);
+          this.sprite.y += this.knockback.y;
+          this.knockbackApplied = true;
+        }
+
+        this.blockStunTimer--;
+        if (this.blockStunTimer > 0) return;
+
+        // After blockstun ends, remain in guard as long as input is held
+        if (this.isHoldingDownBack()) {
+          this.changeState("guardLo");
+        } else if (this.isHoldingBack()) {
+          this.changeState("guardHi");
+        } else {
+          this.changeState("idle");
+        }
+        return;
+
 
       case "hitstun":
         if (this.justEnteredState) {

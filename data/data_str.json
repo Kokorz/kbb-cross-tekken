@@ -326,12 +326,25 @@
     "nmlAtk5LP": {
       "playOnce": true,
       "frames": [
-        { "image": "chr_str/str_nmlAtk5LP_000.png", "duration": 2 },
-        { "image": "chr_str/str_nmlAtk5LP_001.png", "duration": 2 },
-        { "image": "chr_str/str_nmlAtk5LP_002.png", "duration": 3, "boxes": [{"type": "hitbox", "x": -250, "y": -350, "w": 230, "h": 40}], "movedata": [{"damage": 200, "hit_pause": 3, "hit_stun": 24, "hit_knockback": [-24,0], "block_pause": 3, "block_stun" : 12, "block_knockback": [-3,0], "hit_animtype_ground": "High", "guard_flag": "Mid"}] },
-        { "image": "chr_str/str_nmlAtk5LP_003.png", "duration": 3 },
-        { "image": "chr_str/str_nmlAtk5LP_004.png", "duration": 3 },
-        { "image": "chr_str/str_nmlAtk5LP_005.png", "duration": 3 }
+        { "image": "chr_str/str_nmlAtk5LP_000.png", "duration": 6, "offset": [8,0] },
+        { "image": "chr_str/str_nmlAtk5LP_001.png", "duration": 2, "offset": [8,0], "boxes": [{"type": "hitbox", "x": 10, "y": -15, "w": 20, "h": 10}], "movedata": [{"damage": 200, "hit_pause": 3, "hit_stun": 24, "hit_knockback": [-24,0], "block_pause": 3, "block_stun" : 12, "block_knockback": [-3,0], "hit_animtype_ground": "High", "guard_flag": "Mid"}]  },
+        { "image": "chr_str/str_nmlAtk5LP_002.png", "duration": 8, "offset": [8,0] },
+        { "image": "chr_str/str_nmlAtk5LP_003.png", "duration": 8, "offset": [8,0] },
+        { "image": "chr_str/str_nmlAtk5LP_003.png", "duration": 8, "offset": [8,0] }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "nmlAtk5RP": {
+      "playOnce": true,
+      "frames": [
+        { "image": "chr_str/str_nmlAtk5RP_000.png", "duration": 4 },
+        { "image": "chr_str/str_nmlAtk5RP_001.png", "duration": 2, "boxes": [{"type": "hitbox", "x": -250, "y": -350, "w": 230, "h": 40}], "movedata": [{"damage": 200, "hit_pause": 3, "hit_stun": 24, "hit_knockback": [-24,0], "block_pause": 3, "block_stun" : 12, "block_knockback": [-3,0], "hit_animtype_ground": "High", "guard_flag": "Mid"}]  },
+        { "image": "chr_str/str_nmlAtk5RP_002.png", "duration": 12 },
+        { "image": "chr_str/str_nmlAtk5RP_003.png", "duration": 12 },
+        { "image": "chr_str/str_nmlAtk5RP_003.png", "duration": 60 }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},

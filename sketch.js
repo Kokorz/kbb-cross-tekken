@@ -325,9 +325,9 @@ function checkHits(attacker, defender) {
   if (globalHitPause > 0) return;
 
   const currentMD = attacker.getCurrentMoveData();
-
-  // If no movedata or cannot hit now, ignore
   if (!currentMD || !attacker.canHitThisSequence) return;
+
+  const guardFlag = currentMD.guard_flag; // "High", "Mid", "Low"
 
   const hitboxes = attacker.hitboxes;
   const hurtboxes = defender.hurtboxes;
@@ -338,19 +338,64 @@ function checkHits(attacker, defender) {
     for (const hurt of hurtboxes) {
       if (hurt.w === 0 || hurt.h === 0) continue;
 
-      if (rectOverlap(hit, hurt)) {
-        // Hit registered
-        defender.takeHit(attacker, { movedata: currentMD });
+      if (!rectOverlap(hit, hurt)) continue;
 
-        // Prevent repeat hitting during identical movedata frames
-        attacker.canHitThisSequence = false;
-        attacker.lastHitMoveData = currentMD;
+      // -------------------------------
+      // 1. Tekken high whiff rule
+      // -------------------------------
+      if (
+        guardFlag === "High" &&
+        defender.isCrouching &&
+        !defender.isGuarding
+      ) {
+        // High attacks completely whiff against crouching non-guard
         return;
       }
+
+      // -------------------------------
+      // 2. Determine if this is a block
+      // -------------------------------
+      let isBlock = false;
+
+      if (defender.isGuarding) {
+        // Standing guard blocks High + Mid
+        if (
+          (guardFlag === "High" || guardFlag === "Mid") &&
+          defender.isStandingGuard
+        ) {
+          isBlock = true;
+        }
+
+        // Crouch guard blocks Low
+        else if (
+          guardFlag === "Low" &&
+          defender.isCrouchGuard
+        ) {
+          isBlock = true;
+        }
+      }
+
+      // -------------------------------
+      // 3. Apply block or hit reaction
+      // -------------------------------
+      if (isBlock) {
+        defender.takeBlock(attacker, { movedata: currentMD });
+      } else {
+        defender.takeHit(attacker, { movedata: currentMD });
+      }
+
+      // -------------------------------
+      // 4. Prevent repeat hits
+      // -------------------------------
+      attacker.canHitThisSequence = false;
+      attacker.lastHitMoveData = currentMD;
+
+      return;
     }
   }
 }
-  
+
+
 function resolvePush(p1, p2) {
   let minOverlap = Infinity;
 
