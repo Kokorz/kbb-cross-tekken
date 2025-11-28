@@ -735,6 +735,8 @@ class Character {
             this.knockbackApplied = true;
           }
 
+          this.sprite.vel.x *= 0.7;
+
           this.advanceFrame();
 
           this.blockStunTimer--;
@@ -761,6 +763,7 @@ class Character {
           this.frameIndex = 0;
           this.frameTimer = 0;
           this.justEnteredState = false;
+          this.sprite.vel.x = 0;
         }
 
         this.advanceFrame();
@@ -793,6 +796,8 @@ class Character {
             this.knockbackApplied = true;
           }
 
+          this.sprite.vel.x *= 0.7;
+
           this.advanceFrame();
 
           this.blockStunTimer--;
@@ -817,6 +822,7 @@ class Character {
           this.frameIndex = 0;
           this.frameTimer = 0;
           this.justEnteredState = false;
+          this.sprite.vel.x = 0;
         }
 
         this.advanceFrame();
