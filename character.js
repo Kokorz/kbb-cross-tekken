@@ -426,24 +426,36 @@ class Character {
 
     const gf = movedata.guard_flag;
 
-    const isStandingInput = this.isHoldingBack();
-    const isCrouchingInput = this.isHoldingDownBack();
+    const standInput = this.isHoldingBack();
+    const crouchInput = this.isHoldingDownBack();
 
     let blockCorrect = false;
 
-    if (isStandingInput && (gf === "High" || gf === "Mid")) blockCorrect = true;
-    if (isCrouchingInput && (gf === "Low")) blockCorrect = true;
+    if (standInput && (gf === "High" || gf === "Mid")) blockCorrect = true;
+    if (crouchInput && gf === "Low") blockCorrect = true;
 
     if (!blockCorrect) {
       this.takeHit(attacker, { movedata });
       return;
     }
 
-    // Store stun data for blockstun state to read
-    this._pendingBlockStunTimer = movedata.block_stun;
-    this._pendingBlockKnockback = movedata.block_knockback || [0,0] ;
+    // Store pending block state for the next frame
+    this._pendingGuardState = crouchInput ? "guardLo" : "guardHi";
 
-    this.changeState("blockstun");
+    // Store blockstun info
+    this._pendingBlockStunTimer = movedata.block_stun || 0;
+    this._pendingKnockback = {
+      x: (movedata.block_knockback && movedata.block_knockback[0]) || 0,
+      y: (movedata.block_knockback && movedata.block_knockback[1]) || 0,
+    };
+    this.knockbackApplied = false;
+
+    // FORCE the correct guard state so blockstun logic can run
+    if (crouchInput) {
+      if (this.state !== "guardLo") this.changeState("guardLo");
+    } else {
+      if (this.state !== "guardHi") this.changeState("guardHi");
+    }
   }
 
   handleButtonTaps() {
@@ -462,6 +474,16 @@ class Character {
     this.handleInput();
     this.updateFacing();
     this.updateBoxes();
+
+    if (this._pendingGuardState) {
+      this.changeState(this._pendingGuardState);
+      this.blockStunTimer = this._pendingBlockStunTimer;
+      this.knockback = this._pendingKnockback;
+      this._pendingGuardState = null;
+      this._pendingBlockStunTimer = 0;
+      this._pendingKnockback = { x: 0, y: 0 };
+    }
+
     this.handleStandardStates();
     if (this[`state_${this.state}`]) this[`state_${this.state}`]();
     this.sprite.x = floor(this.sprite.x);
@@ -697,18 +719,41 @@ class Character {
           this.setAnim("guardHi");
           this.frameIndex = 0;
           this.frameTimer = 0;
+          this.knockbackApplied = false;
           this.justEnteredState = false;
         }
 
-        this.advanceFrame();
+        // === BLOCKSTUN MODE ===
+        if (this.blockStunTimer > 0) {
+          if (globalHitPause > 0) return;
 
-        // Still blocking?
-        if (!this.isHoldingBack()) {
+          //  APPLY ONE-TIME KNOCKBACK (right after hitstop ends) 
+          if (!this.knockbackApplied) {
+            // apply immediate translation once
+            this.sprite.vel.x += this.knockback.x * (this.facing === 1 ? 1 : -1);
+            this.sprite.vel.y += this.knockback.y;
+            this.knockbackApplied = true;
+          }
+
+          this.advanceFrame();
+
+          this.blockStunTimer--;
+          if (this.blockStunTimer > 0) return;
+
+          // End of blockstun → go to guard post
           this.changeState("guardPostHi");
           return;
         }
 
+        this.advanceFrame();
+
+        // Once animation finishes, go to post guard regardless of input
+        const hiAnim = this.anims.guardHi;
+        if (this.frameIndex >= hiAnim.frames.length - 1) {
+          this.changeState("guardPostHi");
+        }
         break;
+
 
       case "guardPostHi":
         if (this.justEnteredState) {
@@ -732,17 +777,38 @@ class Character {
           this.setAnim("guardLo");
           this.frameIndex = 0;
           this.frameTimer = 0;
+          this.knockbackApplied = false;
           this.justEnteredState = false;
         }
 
-        this.advanceFrame();
+        // === BLOCKSTUN MODE ===
+        if (this.blockStunTimer > 0) {
+          if (globalHitPause > 0) return;
 
-        // Continue blocking?
-        if (!this.isHoldingDownBack()) {
+          //  APPLY ONE-TIME KNOCKBACK (right after hitstop ends) 
+          if (!this.knockbackApplied) {
+            // apply immediate translation once
+            this.sprite.vel.x += this.knockback.x * (this.facing === 1 ? 1 : -1);
+            this.sprite.vel.y += this.knockback.y;
+            this.knockbackApplied = true;
+          }
+
+          this.advanceFrame();
+
+          this.blockStunTimer--;
+          if (this.blockStunTimer > 0) return;
+
           this.changeState("guardPostLo");
           return;
         }
 
+        this.advanceFrame();
+
+        // Once animation finishes, go to post guard regardless of input
+        const loAnim = this.anims.guardLo;
+        if (this.frameIndex >= loAnim.frames.length - 1) {
+          this.changeState("guardPostLo");
+        }
         break;
 
       case "guardPostLo":
@@ -761,49 +827,6 @@ class Character {
           else this.changeState("idle");
         }
         break;
-
-      case "blockstun":
-        // 1. Initialization
-        if (this.justEnteredState) {
-          // Choose correct block animation
-          if (this.isHoldingDownBack()) {
-            this.setAnim("guardLo");
-          } else {
-            this.setAnim("guardHi");
-          }
-
-          // Initialize stun/knockback (saved earlier by takeBlock)
-          this.blockStunTimer = this._pendingBlockStunTimer;
-          this.knockback = this._pendingBlockKnockback;
-          this.knockbackApplied = false;
-
-          this.justEnteredState = false;
-        }
-
-        // 2. Freeze during hitstop
-        if (globalHitPause > 0) return;
-
-        // 3. Knockback (first frame of stun)
-        if (!this.knockbackApplied) {
-          this.sprite.x += this.knockback.x * (this.facing === 1 ? 1 : -1);
-          this.sprite.y += this.knockback.y;
-          this.knockbackApplied = true;
-        }
-
-        // 4. Run animation frames
-        this.advanceFrame();
-
-        // 5. Timer
-        this.blockStunTimer--;
-        if (this.blockStunTimer > 0) return;
-
-        // 6. End of blockstun → guardPost transitions
-        if (this.isHoldingDownBack()) this.changeState("guardPostLo");
-        else if (this.isHoldingBack()) this.changeState("guardPostHi");
-        else this.changeState("guardPostHi");
-
-        return;
-
 
       case "hitstun":
         if (this.justEnteredState) {
@@ -847,9 +870,14 @@ class Character {
         //  APPLY ONE-TIME KNOCKBACK (right after hitstop ends) 
         if (!this.knockbackApplied) {
           // apply immediate translation once
-          this.sprite.x += this.knockback.x * (this.facing === 1 ? 1 : -1);
-          this.sprite.y += this.knockback.y;
+          this.sprite.vel.x += this.knockback.x * (this.facing === 1 ? 1 : -1);
+          this.sprite.vel.y += this.knockback.y;
           this.knockbackApplied = true;
+        }
+
+        if (this.sprite.vel.x) {
+          this.sprite.x += this.sprite.vel.x;
+          this.sprite.vel.x *= 0.7;
         }
 
         // Advance hurt animation while in hitstun
@@ -861,6 +889,7 @@ class Character {
 
         // Exit hitstun: return to crouch if holding down, otherwise idle
         const dirAfter = this.getCurrentDirection();
+        this.sprite.vel.x = 0;
         if (dirAfter === 2 || dirAfter === 1 || dirAfter === 3) {
           this.changeState("crouch");
         } else {
