@@ -405,5 +405,68 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
                 this.changeState("idle");
             }
             return;
+
+        case "airHitstun":
+            if (this.justEnteredState) {
+                // Start with hurtairstun
+                this.setAnim("hurtAirStun");
+                this.frameIndex = 0;
+                this.frameTimer = 0;
+                this.justEnteredState = false;
+
+                // clear the hint
+                this.incomingHitAnimType = null;
+            }
+
+            // Shared hitstop freeze
+            if (globalHitPause > 0) return;
+
+            // Apply one-time knockback
+            if (!this.knockbackApplied) {
+                this.sprite.vel.x += this.knockback.x * (this.facing === 1 ? 1 : -1);
+                this.sprite.vel.y += this.knockback.y;
+                this.knockbackApplied = true;
+            }
+
+            // Apply velocities
+            this.sprite.x += this.sprite.vel.x;
+            this.sprite.y += this.sprite.vel.y;
+
+            // Gravity pull
+            this.sprite.vel.y += 0.07; // adjust gravity
+
+            // Horizontal drag
+            this.sprite.vel.x *= 0.95;
+
+            // Switch to air fall animation only once moving downward
+            if (this.sprite.vel.y > 0 && this.currentAnim !== "hurtAirFall") {
+                console.log(this.currentAnim);
+                this.setAnim("hurtAirFall");
+                console.log(this.currentAnim);
+                this.frameIndex = 0;
+                this.frameTimer = 0;
+            }
+
+            // Advance hurt animation only while in active hitstun
+            if (this.hitStunTimer > 0) {
+                this.advanceFrame();
+                this.hitStunTimer--;
+            }
+
+            // Landing detection
+            if (this.sprite.y >= gfloor.y) {
+                this.sprite.y = gfloor.y;
+                this.sprite.vel.x = 0;
+                this.sprite.vel.y = 0;
+
+                // Transition depending on vertical speed or knockback
+                if (this.knockback.y > 5) {
+                    this.changeState("knockdown");
+                } else {
+                    this.changeState("groundBounce"); // optional
+                }
+            }
+            return;
+
     }
 }
