@@ -12,8 +12,40 @@ let UI;
 
 let globalHitPause = 0;
 
+// numpad direction grid
+// 7 8 9
+// 4 5 6
+// 1 2 3
+
+const DIR = {
+  1: { x: -1, y: -1, flip: 3 },
+  2: { x: 0, y: -1, flip: 2 },
+  3: { x: 1, y: -1, flip: 1 },
+
+  4: { x: -1, y: 0, flip: 6 },
+  5: { x: 0, y: 0, flip: 5 },
+  6: { x: 1, y: 0, flip: 4 },
+
+  7: { x: -1, y: 1, flip: 9 },
+  8: { x: 0, y: 1, flip: 8 },
+  9: { x: 1, y: 1, flip: 7 },
+};
+
+const DIR_FROM_AXES = {
+  "-1,1": 7,
+  "0,1": 8,
+  "1,1": 9,
+  "-1,0": 4,
+  "0,0": 5,
+  "1,0": 6,
+  "-1,-1": 1,
+  "0,-1": 2,
+  "1,-1": 3,
+};
+
+
 const MOTIONS = {
-  run: { sequences: [[6, 6]], leniency: 3 },
+  run: { sequences: [[6, 6]], leniency: 6 },
   qcf: { sequences: [[2, 3, 6]], leniency: 4 },
   dp: {
     sequences: [
@@ -54,14 +86,15 @@ function preload() {
 }
 
 function setup() {
+
+  str_loadedAnimations = loadAnimations(data_str);
+  gli_loadedAnimations = loadAnimations(data_gli);
+
   new Canvas(256, 144);
   displayMode(CENTER, PIXELATED, 8);
   frameRate(60);
 
   allSprites.pixelPerfect = true;
-
-  str_loadedAnimations = loadAnimations(data_str);
-  gli_loadedAnimations = loadAnimations(data_gli);
 
   gfloor = new Sprite();
   gfloor.y = width * 0.972;
@@ -230,70 +263,68 @@ function drawInfiniteFloor() {
 }
 
 //  INPUT / MOTION 
-function getCurrentDirection() {
-  const up = keyIsDown(this.keybindings.up),
-    down = keyIsDown(this.keybindings.down),
-    left = keyIsDown(this.keybindings.left),
-    right = keyIsDown(this.keybindings.right);
-  if (up && right) return 9;
-  if (up && left) return 7;
-  if (down && right) return 3;
-  if (down && left) return 1;
-  if (up) return 8;
-  if (down) return 2;
-  if (left) return 4;
-  if (right) return 6;
-  return 5;
-}
-
 function matchPattern(buffer, pattern, leniency = 3, timeWindow = 12) {
   let seqIndex = pattern.length - 1;
-  let lastFrame = null;
   let mismatches = 0;
+  let lastFrame = null;
 
   for (let i = buffer.length - 1; i >= 0; i--) {
     const { dir, frame } = buffer[i];
+
     if (lastFrame !== null && lastFrame - frame > timeWindow) break;
 
     if (dir === pattern[seqIndex]) {
       seqIndex--;
       lastFrame = frame;
       if (seqIndex < 0) return true;
-    } else mismatches++;
-
-    if (mismatches > leniency) break;
+    } else {
+      mismatches++;
+      if (mismatches > leniency) break;
+    }
   }
   return false;
 }
 
-function flipDirValue(dir) {
-  const map = { 1: 3, 3: 1, 4: 6, 6: 4, 7: 9, 9: 7 };
-  return map[dir] ?? dir;
+
+function flipDir(dir) {
+  return DIR[dir].flip;
+}
+
+function detectDash(buffer, facing) {
+  const forwardDir = (facing === 1 ? 6 : 4);
+  const backDir = DIR[forwardDir].flip;
+  const maxGap = 8;
+
+  let lastTap = null;
+
+  for (let i = buffer.length - 1; i >= 0; i--) {
+    const { dir, frame } = buffer[i];
+
+    if (dir === forwardDir) {
+      if (lastTap !== null && lastTap - frame <= maxGap) return true;
+      lastTap = frame;
+    }
+
+    if (dir === backDir) break;
+  }
+  return false;
 }
 
 function detectMotion(buffer, motionName, facing = 1) {
+  // Special-case dash/run
   if (motionName === "run") {
-    const forward = facing === 1 ? 6 : 4;
-    const timeWindow = 8; // adjust for responsiveness
-    let lastTap = null;
-
-    for (let i = buffer.length - 1; i >= 0; i--) {
-      const { dir, frame } = buffer[i];
-      if (dir === forward) {
-        if (lastTap !== null && lastTap - frame <= timeWindow) return true;
-        lastTap = frame;
-      }
-      // invalidate if opposite direction appears between taps
-      if (dir === (forward === 6 ? 4 : 6)) break;
-    }
-    return false;
+    return detectDash(buffer, facing);
   }
 
   const motion = MOTIONS[motionName];
   if (!motion) return false;
 
-  return motion.sequences.some((seq) => {
-    const adjusted = seq.map((v) => (facing === -1 ? flipDirValue(v) : v));
+  return motion.sequences.some(seq => {
+    // flip sequence based on facing
+    const adjusted = (facing === 1)
+      ? seq
+      : seq.map(d => DIR[d].flip);
+
     return matchPattern(buffer, adjusted, motion.leniency);
   });
 }
@@ -345,8 +376,8 @@ function checkHits(attacker, defender) {
       //    A standing High attack whiffs on a crouching defender
       //    IF they are not attempting to guard.
       // ----------------------------------------------------------
-      if (guardFlag === "High" && defender.isCrouching && 
-          !defender.isHoldingBack() && !defender.isHoldingDownBack()) {
+      if (guardFlag === "High" && defender.isCrouching &&
+        !defender.isHoldingBack() && !defender.isHoldingDownBack()) {
         return;
       }
 

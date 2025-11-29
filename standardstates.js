@@ -1,5 +1,8 @@
 Character.prototype.handleStandardStates = function handleStandardStates() {
 
+    const dir = this.getCurrentDirection();
+    const d = DIR[dir]; // x/y info
+
     switch (this.state) {
         case "idle":
             this.handleButtonTaps();
@@ -23,13 +26,13 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
             this.advanceFrame();
 
             // Move to crouch
-            if (keyIsDown(this.keybindings.down)) {
+            if (d.y === -1) {
                 this.changeState("crouch");
-                return;
             }
 
+
             // Move to jump
-            if (keyIsDown(this.keybindings.up)) {
+            if (d.y === 1) {
                 this.changeState("prejump");
                 return;
             }
@@ -39,10 +42,7 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
                 return;
             }
 
-            if (
-                keyIsDown(this.keybindings.left) ||
-                keyIsDown(this.keybindings.right)
-            ) {
+            if (d.x !== 0) {
                 this.changeState("walk");
                 return;
             }
@@ -66,7 +66,7 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
 
             this.advanceFrame();
 
-            if (!keyIsDown(this.keybindings.down)) {
+            if (d.y !== -1) {
                 this.changeState("idle");
                 return;
             }
@@ -75,60 +75,44 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
             break;
 
         case "walk":
-            let moveDir = 0;
-            if (keyIsDown(this.keybindings.left)) moveDir = -1;
-            if (keyIsDown(this.keybindings.right)) moveDir = 1;
-
+            let moveDir = d.x; // -1 left, 0 neutral, 1 right
             if (moveDir !== 0) {
                 const relativeDir = moveDir * this.facing;
                 this.setAnim(relativeDir === 1 ? "walkF" : "walkB");
                 this.sprite.x += moveDir;
-            } else this.changeState("idle");
+            } else {
+                this.changeState("idle");
+            }
 
             this.advanceFrame();
-            if (keyIsDown(this.keybindings.up)) this.changeState("prejump");
+            if (d.y === 1) this.changeState("prejump");
             this.handleButtonTaps();
             break;
 
         case "run":
-            // Determine input relative to facing
-            let inputDir = 0;
-            if (keyIsDown(this.keybindings.left)) inputDir = -1;
-            if (keyIsDown(this.keybindings.right)) inputDir = 1;
+            let runDir = d.x;
             const forward = this.facing;
-            const relativeInput = inputDir * forward;
+            const relativeRun = runDir * forward;
             const runSpeed = 4;
 
-            if (relativeInput > 0) {
-                // Running forward
+            if (relativeRun > 0) {
                 this.setAnim("run");
                 this.sprite.vel.x = lerp(this.sprite.vel.x, forward * runSpeed, 0.3);
                 this.advanceFrame("run");
-            } else if (relativeInput < 0) {
-                // Back input: switch to walk
+            } else if (relativeRun < 0) {
                 this.sprite.vel.x = 0;
                 this.changeState("walk");
                 return;
-            } else if (relativeInput === 0 && this.sprite.vel.x !== 0) {
-                // Decelerate
+            } else if (relativeRun === 0 && this.sprite.vel.x !== 0) {
                 this.setAnim("runStop");
                 this.advanceFrame("runStop");
                 this.sprite.vel.x = lerp(this.sprite.vel.x, 0, 0.2);
                 if (abs(this.sprite.vel.x) < 0.5) this.sprite.vel.x = 0;
-                if (
-                    !keyIsDown(this.keybindings.left) &&
-                    !keyIsDown(this.keybindings.right) &&
-                    this.sprite.vel.x === 0
-                ) {
-                    this.changeState("idle");
-                }
+                if (this.sprite.vel.x === 0) this.changeState("idle");
                 return;
             }
 
-            // Jump check
-            if (keyIsDown(this.keybindings.up)) this.changeState("prejump");
-
-            // Button taps
+            if (d.y === 1) this.changeState("prejump");
             this.handleButtonTaps();
             break;
 
@@ -181,8 +165,7 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
                 this.frameIndex = 0;
                 this.frameTimer = 0;
                 this.sprite.vel.y = this.jumpSpeedY;
-                const hor = this.horizontalFromDir(this.getCurrentDirection());
-                this.sprite.vel.x = hor * this.jumpSpeedX;
+                this.sprite.vel.x = d.x * this.jumpSpeedX;
                 this.justEnteredState = false;
             }
 
@@ -244,7 +227,14 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
                     this.knockbackApplied = true;
                 }
 
-                this.sprite.vel.x *= 0.7;
+                const FRICTION_PER_SECOND_HI = 6; // pixels per second per second
+                const dt = 1 / 60;
+                const frictionMultiplier = Math.exp(-FRICTION_PER_SECOND_HI * dt);
+
+                this.sprite.vel.x *= frictionMultiplier;
+
+                // minimal cutoff to stop
+                if (Math.abs(this.sprite.vel.x) < 0.05) this.sprite.vel.x = 0;
 
                 this.advanceFrame();
 
@@ -279,7 +269,7 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
 
             const hiPostA = this.anims.guardHiPost;
             if (this.frameIndex >= hiPostA.frames.length - 1) {
-                if (keyIsDown(this.keybindings.down)) this.changeState("crouch");
+                if (d.y === -1) this.changeState("crouch");
                 else this.changeState("idle");
             }
             break;
@@ -305,7 +295,11 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
                     this.knockbackApplied = true;
                 }
 
-                this.sprite.vel.x *= 0.7;
+                const FRICTION_PER_SECOND_LO = 7; // pixels per second per second
+                const dt = 1 / 60;
+                const frictionMultiplier = Math.exp(-FRICTION_PER_SECOND_LO * dt);
+
+                this.sprite.vel.x *= frictionMultiplier;
 
                 this.advanceFrame();
 
@@ -338,7 +332,7 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
 
             const loPostA = this.anims.guardLoPost;
             if (this.frameIndex >= loPostA.frames.length - 1) {
-                if (keyIsDown(this.keybindings.down)) this.changeState("crouch");
+                if (d.y === -1) this.changeState("crouch");
                 else this.changeState("idle");
             }
             break;
@@ -358,8 +352,8 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
                 } else {
                     // Prefer explicit animtype from movedata, fallback to standLo
                     const map = {
-                        standHi: "hurtStandHi",
-                        standLo: "hurtStandLo",
+                        High: "hurtStandHi",
+                        Low: "hurtStandLo",
                     };
                     if (this.incomingHitAnimType) {
                         this.setAnim(map[this.incomingHitAnimType] || "hurtStandLo");

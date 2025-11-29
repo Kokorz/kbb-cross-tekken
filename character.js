@@ -57,19 +57,18 @@ class Character {
     this.lastMoveData = null;
     this.lastHitMoveData = null;
 
-    this.isGuarding = false;
-    this.isStandingGuard = false;
-    this.isCrouchGuard = false;
     this.blockStunTimer = 0;
-
 
     this.inputBuffer = [];
     this.bufferExpireFrames = 15;
 
     this.buttonBuffer = [];
-    this.lastDirState = {}; // tracks which directions were previously pressed
-    for (let d = 1; d <= 9; d++) this.lastDirState[d] = false;
-    this.lastButtonState = { a: false, b: false, c: false, d: false };
+
+    this.prevInputs = {
+      dir: 5,
+      lp: false, rp: false, lk: false, rk: false
+    };
+
 
     this.ground = gfloor;
   }
@@ -179,96 +178,84 @@ class Character {
   }
 
   handleInput() {
-    const dir = this.getCurrentDirection();
-    // If neutral, mark all directions as "released"
-    if (dir === 5) {
-      for (let d = 1; d <= 9; d++) this.lastDirState[d] = false;
-      return;
+    const now = frameCount;
+
+    // ---- Compute current direction from table-driven system ----
+    const dir = this.getCurrentDirection(); // uses DIR_FROM_AXES
+
+    // ---- Poll buttons for this frame ----
+    const curBtn = {
+      lp: keyIsDown(this.keybindings.lp),
+      rp: keyIsDown(this.keybindings.rp),
+      lk: keyIsDown(this.keybindings.lk),
+      rk: keyIsDown(this.keybindings.rk),
+    };
+
+    //  Direction edge detection (push only when direction changes)
+
+    if (dir !== 5 && dir !== this.prevInputs.dir) {
+      // Only push if non-neutral AND changed since last frame
+      this.inputBuffer.push({ dir, frame: now });
     }
 
-    // Only push if this direction was previously *not pressed*
-    if (!this.lastDirState[dir]) {
-      this.pushInput(dir);
-      this.lastDirState[dir] = true;
-    }
+    //  Button rising-edge detection (push only once per tap)
+    for (const b in curBtn) {
+      const isDown = curBtn[b];
+      const wasDown = this.prevInputs[b];
 
-    // Push button taps into buffer using keyIsDown
-    ["lp", "rp", "lk", "rk"].forEach((btn) => {
-      if (keyIsDown(this.keybindings[btn]) && !this.lastButtonState[btn]) {
-        this.pushButton(btn); // record the tap
+      if (isDown && !wasDown) {
+        // Button was pressed this frame
+        this.buttonBuffer.push({ btn: b, frame: now });
       }
-      // Update lastButtonState so we only push once per press
-      this.lastButtonState[btn] = keyIsDown(this.keybindings[btn]);
-    });
-
-    // Update lastDirState array for directional logic
-    for (let d = 1; d <= 9; d++) {
-      if (d !== dir) this.lastDirState[d] = false;
     }
-  }
 
-  flipDir(dir) {
-    const map = { 1: 3, 3: 1, 4: 6, 6: 4, 7: 9, 9: 7 };
-    return map[dir] ?? dir;
+    //  Save snapshot for next frame
+    this.prevInputs.dir = dir;
+    for (const b in curBtn) this.prevInputs[b] = curBtn[b];
+
+    //  Expire old entries
+    const cutoff = now - this.bufferExpireFrames;
+
+    this.inputBuffer = this.inputBuffer.filter(e => e.frame > cutoff);
+    // Button buffer typically has small fixed retention (~20 frames)
+    this.buttonBuffer = this.buttonBuffer.filter(e => now - e.frame <= 20);
   }
 
   getCurrentDirection() {
-    const u = keyIsDown(this.keybindings.up),
-      d = keyIsDown(this.keybindings.down),
-      l = keyIsDown(this.keybindings.left),
-      r = keyIsDown(this.keybindings.right);
-    if (u && r) return 9;
-    if (u && l) return 7;
-    if (d && r) return 3;
-    if (d && l) return 1;
-    if (u) return 8;
-    if (d) return 2;
-    if (l) return 4;
-    if (r) return 6;
-    return 5;
+    const x =
+      (keyIsDown(this.keybindings.right) ? 1 : 0) +
+      (keyIsDown(this.keybindings.left) ? -1 : 0);
+
+    const y =
+      (keyIsDown(this.keybindings.up) ? 1 : 0) +
+      (keyIsDown(this.keybindings.down) ? -1 : 0);
+
+    return DIR_FROM_AXES[`${x},${y}`];
   }
 
-  horizontalFromDir(dir) {
-    if ([1, 4, 7].includes(dir)) return -1;
-    if ([3, 6, 9].includes(dir)) return 1;
-    return 0;
+  flipDir(dir) {
+    return DIR[dir].flip;
   }
 
   isHoldingBack() {
-    const backKey = this.facing === 1 ? this.keybindings.left : this.keybindings.right;
-    return keyIsDown(backKey) && !keyIsDown(this.keybindings.down);
+    const dir = this.getCurrentDirection();
+    const d = DIR[dir];
+
+    // Facing 1 → back = x = -1
+    // Facing -1 → back = x = +1
+    const backX = (this.facing === 1 ? -1 : 1);
+
+    // "Standing" or "jumping" back (not crouching)
+    return d.x === backX && d.y >= 0;
   }
 
   isHoldingDownBack() {
-    const backKey = this.facing === 1 ? this.keybindings.left : this.keybindings.right;
-    return keyIsDown(backKey) && keyIsDown(this.keybindings.down);
-  }
+    const dir = this.getCurrentDirection();
+    const d = DIR[dir];
 
+    const backX = (this.facing === 1 ? -1 : 1);
 
-  pushInput(dir) {
-    const now = frameCount;
-
-    // Avoid duplicate pushes on the same frame
-    if (
-      this.inputBuffer.length > 0 &&
-      this.inputBuffer[this.inputBuffer.length - 1].dir === dir &&
-      this.inputBuffer[this.inputBuffer.length - 1].frame === now
-    )
-      return;
-
-    this.inputBuffer.push({ dir, frame: now });
-
-    if (this.inputBuffer.length > this.maxBufferSize) this.inputBuffer.shift();
-
-    // Expire old inputs
-    this.inputBuffer = this.inputBuffer.filter(
-      (e) => now - e.frame < this.bufferExpireFrames
-    );
-  }
-
-  pushButton(btn) {
-    this.buttonBuffer.push({ btn, frame: frameCount });
-    if (this.buttonBuffer.length > 20) this.buttonBuffer.shift();
+    return d.x === backX && d.y === -1;
   }
 
   wasButtonTapped(btn, windowFrames = 2) {
@@ -286,17 +273,7 @@ class Character {
     return false;
   }
 
-  getBuffer() {
-    const now = frameCount;
-
-    // Keep only the recent entries within bufferExpireFrames
-    this.inputBuffer = this.inputBuffer.filter((entry) => {
-      const age = now - entry.frame;
-      return age < this.bufferExpireFrames;
-    });
-
-    return this.inputBuffer;
-  }
+  getBuffer() { return this.inputBuffer; }
 
   hasMotion(name) {
     return detectMotion(this.getBuffer(), name, this.facing);
@@ -426,6 +403,8 @@ class Character {
 
     const gf = movedata.guard_flag;
 
+    globalHitPause = movedata.block_pause || 0;
+
     const standInput = this.isHoldingBack();
     const crouchInput = this.isHoldingDownBack();
 
@@ -493,5 +472,5 @@ class Character {
   //open standardstates.js for this class's definition!
   //...
   //im so glad there is an equivalent to C++ class method prototypes in js.
-  handleStandardStates() {}
+  handleStandardStates() { }
 }
