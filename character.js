@@ -71,14 +71,16 @@ class Character {
 
     this.ground = gfloor;
 
+    this.currentAttackResult = null; // null | "hit" | "block" | "whiff"
+
     this.states = {
       idle: { type: "stand" },
       crouch: { type: "crouch" },
-      walk: {type: "stand"},
-      run: {type: "stand"},
+      walk: { type: "stand" },
+      run: { type: "stand" },
       turn: { type: "stand" },
       crouchTurn: { type: "crouch" },
-      prejump: {type: "stand"},
+      prejump: { type: "stand" },
       jump: { type: "air" },
       fall: { type: "air" },
       land: { type: "ground" },
@@ -92,6 +94,39 @@ class Character {
       knockdown: { type: "liedown" }
     };
 
+    this.CANCEL_TABLE = [];
+
+    // this.CANCEL_TABLE = [
+    //   {
+    //     fromState: ["nmlAtk5LP"],    // states you can cancel from
+    //     result: "hit",               // null = any, can be "hit" | "block" | "whiff"
+    //     minFrame: 4,                 // runtime frame window
+    //     maxFrame: 9,
+    //     minKeyframe: 1,              // keyframe index window
+    //     maxKeyframe: 1,
+    //     buttons: ["rp"],             // optional button tap requirement
+    //     motion: null,                // optional motion input name
+    //     to: "nmlAtk5RP",             // state to transition to
+    //   },
+    //   {
+    //     fromState: ["nmlAtk5LP"],
+    //     result: "whiff",
+    //     minFrame: 0,
+    //     maxFrame: 6,
+    //     to: "idle",
+    //   },
+    //   {
+    //     fromState: ["nmlAtk2LK"],
+    //     result: "block",
+    //     minFrame: 2,
+    //     maxKeyframe: 0,
+    //     buttons: ["lp"],
+    //     to: "nmlAtk2LP"
+    //   },
+    //   // Add more as needed
+    // ];
+
+    
   }
 
   changeState(newState) {
@@ -394,6 +429,8 @@ class Character {
     const md = attacker.getCurrentMoveData();
     if (!md) return; // safety fallback
 
+    this.currentAttackResult = "hit"; // <-- update attack result
+
     // Damage
     this.health -= md.damage || 0;
     if (this.health < 0) this.health = 0;
@@ -434,7 +471,6 @@ class Character {
   }
 
   takeBlock(attacker, { movedata }) {
-
     const gf = movedata.guard_flag;
 
     globalHitPause = movedata.block_pause || 0;
@@ -443,14 +479,15 @@ class Character {
     const crouchInput = this.isHoldingDownBack();
 
     let blockCorrect = false;
-
     if (standInput && (gf === "High" || gf === "Mid")) blockCorrect = true;
     if (crouchInput && gf === "Low") blockCorrect = true;
 
     if (!blockCorrect) {
-      this.takeHit(attacker, { movedata });
+      this.takeHit(attacker); // <-- automatically sets currentAttackResult = "hit"
       return;
     }
+
+    this.currentAttackResult = "block"; // <-- update attack result
 
     // Store pending block state for the next frame
     this._pendingGuardState = crouchInput ? "guardLo" : "guardHi";
@@ -471,18 +508,6 @@ class Character {
     }
   }
 
-  handleButtonTaps() {
-    const buttons = ["lp", "rp", "lk", "rk"];
-    buttons.forEach((btn) => {
-      if (this.wasButtonTapped(btn))
-        if (this.getCurrentDirection() != 2) {
-          this.changeState(`nmlAtk5${btn.toUpperCase()}`);
-        } else {
-          this.changeState(`nmlAtk2${btn.toUpperCase()}`);
-        }
-    });
-  }
-
   updateLogic() {
     this.handleInput();
     this.updateFacing();
@@ -497,6 +522,7 @@ class Character {
       this._pendingKnockback = { x: 0, y: 0 };
     }
 
+    this.handleCancels();
     this.handleStandardStates();
     if (this[`state_${this.state}`]) this[`state_${this.state}`]();
     this.sprite.x = floor(this.sprite.x);
@@ -507,4 +533,48 @@ class Character {
   //...
   //im so glad there is an equivalent to C++ class method prototypes in js.
   handleStandardStates() { }
+
+  handleCancels() {
+    if (!this.currentAnim) return;
+
+    const runtimeFrame = this.getRuntimeFrame();
+    const keyframe = this.frameIndex;
+
+    for (const entry of this.CANCEL_TABLE) {
+      // Check state
+      if (entry.fromState && !entry.fromState.includes(this.state)) continue;
+
+      // Check attack result
+      if (entry.result && entry.result !== this.currentAttackResult) continue;
+
+      // Check frame ranges
+      if (entry.minFrame !== undefined && runtimeFrame < entry.minFrame) continue;
+      if (entry.maxFrame !== undefined && runtimeFrame > entry.maxFrame) continue;
+
+      if (entry.minKeyframe !== undefined && keyframe < entry.minKeyframe) continue;
+      if (entry.maxKeyframe !== undefined && keyframe > entry.maxKeyframe) continue;
+
+      // Check button tap if required
+      if (entry.buttons && !entry.buttons.every((b) => this.wasButtonTapped(b))) continue;
+
+      // Check motion if required
+      if (entry.motion && !this.hasMotion(entry.motion)) continue;
+
+      // All conditions met, perform cancel
+      this.changeState(entry.to);
+      return; // only cancel to the first valid entry
+    }
+  }
+
+  getRuntimeFrame() {
+    const anim = this.anims[this.currentAnim];
+    if (!anim || !anim.frames) return 0;
+
+    let rcframeCount = 0;
+    for (let i = 0; i < this.frameIndex; i++) {
+      rcframeCount += anim.frames[i].duration || 6;
+    }
+    rcframeCount += this.frameTimer; // add current frame timer
+    return rcframeCount;
+  }
 }

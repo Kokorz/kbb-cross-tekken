@@ -363,6 +363,8 @@ function checkHits(attacker, defender) {
   const hitboxes = attacker.hitboxes;
   const hurtboxes = defender.hurtboxes;
 
+  let hitOccurred = false;
+
   for (const hit of hitboxes) {
     if (!hit || hit.w === 0 || hit.h === 0) continue;
 
@@ -371,45 +373,41 @@ function checkHits(attacker, defender) {
 
       if (!rectOverlap(hit, hurt)) continue;
 
-      // ----------------------------------------------------------
-      // 1. Tekken High Whiff Rule
-      //    A standing High attack whiffs on a crouching defender
-      //    IF they are not attempting to guard.
-      // ----------------------------------------------------------
-      if (guardFlag === "High" && defender.isCrouching &&
-        !defender.isHoldingBack() && !defender.isHoldingDownBack()) {
-        return;
+      hitOccurred = true;
+
+      // Tekken High Whiff Rule: standing High attack whiffs on crouch if defender not guarding
+      if (
+        guardFlag === "High" &&
+        defender.isCrouching &&
+        !defender.isHoldingBack() &&
+        !defender.isHoldingDownBack()
+      ) {
+        continue; // still whiffed
       }
 
-      // ----------------------------------------------------------
-      // 2. Determine if defender is *attempting* to block (via input)
-      //    No proximity. No isGuarding flag. Pure input logic.
-      // ----------------------------------------------------------
+      // Determine if defender is attempting to block
       const wantsToBlock =
         defender.isHoldingBack() || defender.isHoldingDownBack();
-
-      // ----------------------------------------------------------
-      // 3. Apply block or hit.
-      //    takeBlock will internally decide correct/incorrect block.
-      // ----------------------------------------------------------
 
       if (wantsToBlock) {
         defender.takeBlock(attacker, { movedata: currentMD });
       } else {
-        defender.takeHit(attacker, { movedata: currentMD });
+        defender.takeHit(attacker); // internally sets currentAttackResult = "hit"
       }
 
-      // ----------------------------------------------------------
-      // 4. Prevent repeat hits for this sequence
-      // ----------------------------------------------------------
+      // Prevent repeat hits for this sequence
       attacker.canHitThisSequence = false;
       attacker.lastHitMoveData = currentMD;
 
-      return;
+      return; // exit after first successful hit/block
     }
   }
-}
 
+  // If no collision occurred at all, mark as whiff
+  if (!hitOccurred) {
+    attacker.currentAttackResult = "whiff";
+  }
+}
 
 
 function resolvePush(p1, p2) {
@@ -463,6 +461,51 @@ class Stray extends Character {
       const frames = this.anims[animName].frames;
       // console.log(animName, frames.map(f => !!f.img));
     }
+
+    // SAMPLE CANCEL TABE
+    //   this.CANCEL_TABLE = [
+    //     {
+    //       fromState: ["nmlAtk5LP"],    // states you can cancel from
+    //       result: "hit",               // null = any, can be "hit" | "block" | "whiff"
+    //       minFrame: 4,                 // runtime frame window
+    //       maxFrame: 9,
+    //       minKeyframe: 1,              // keyframe index window
+    //       maxKeyframe: 1,
+    //       buttons: ["rp"],             // optional button tap requirement
+    //       motion: null,                // optional motion input name
+    //       to: "nmlAtk5RP",             // state to transition to
+    //     },
+    //     {
+    //       fromState: ["nmlAtk5LP"],
+    //       result: "whiff",
+    //       minFrame: 0,
+    //       maxFrame: 6,
+    //       to: "idle",
+    //     },
+    //     {
+    //       fromState: ["nmlAtk2LK"],
+    //       result: "block",
+    //       minFrame: 2,
+    //       maxKeyframe: 0,
+    //       buttons: ["lp"],
+    //       to: "nmlAtk2LP"
+    //     },
+    //     // Add more as needed
+    //   ];
+
+    // }
+
+    this.CANCEL_TABLE = [
+      // From base states to 5LP
+      { fromState: ["idle", "walk", "run"], buttons: ["lp"], to: "nmlAtk5LP", minFrame: 0 },
+      // From base states to 5RP
+      { fromState: ["idle", "walk", "run"], buttons: ["rp"], to: "nmlAtk5RP", minFrame: 0 },
+      // From base states to 5LK
+      { fromState: ["idle", "walk", "run"], buttons: ["kp"], to: "nmlAtk5LK", minFrame: 0 },
+
+      // Example: cancel 5LP → 5RP (only if hit)
+      { fromState: ["nmlAtk5LP"], result: "hit", buttons: ["rp"], to: "nmlAtk5RP" },
+    ];
 
     this.changeState("idle");
   }

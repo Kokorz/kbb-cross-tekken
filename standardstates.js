@@ -8,9 +8,6 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
             // Record state before input actions
             const before = this.state;
 
-            // Allow attack transitions (and others)
-            this.handleButtonTaps();
-
             // If a new state was selected, stop running idle logic immediately
             if (this.state !== before) return;
 
@@ -76,7 +73,6 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
                 return;
             }
 
-            this.handleButtonTaps();
             break;
 
         case "walk":
@@ -91,7 +87,6 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
 
             this.advanceFrame();
             if (d.y === 1) this.changeState("prejump");
-            this.handleButtonTaps();
             break;
 
         case "run":
@@ -118,7 +113,6 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
             }
 
             if (d.y === 1) this.changeState("prejump");
-            this.handleButtonTaps();
             break;
 
         case "turn":
