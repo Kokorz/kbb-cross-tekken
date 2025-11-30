@@ -69,14 +69,36 @@ class Character {
       lp: false, rp: false, lk: false, rk: false
     };
 
-
     this.ground = gfloor;
+
+    this.states = {
+      idle: { type: "stand" },
+      crouch: { type: "crouch" },
+      walk: {type: "stand"},
+      run: {type: "stand"},
+      turn: { type: "stand" },
+      crouchTurn: { type: "crouch" },
+      prejump: {type: "stand"},
+      jump: { type: "air" },
+      fall: { type: "air" },
+      land: { type: "ground" },
+      guardHi: { type: "stand" },
+      guardLo: { type: "crouch" },
+      guardPostHi: { type: "stand" },
+      guardPostLo: { type: "crouch" },
+      hitstun: { type: "stand" },       // grounded hitstun
+      airHitstun: { type: "air" },      // air hitstun
+      groundbounce: { type: "air" },
+      knockdown: { type: "liedown" }
+    };
+
   }
 
   changeState(newState) {
-    if (this.state === newState) return;
+    // if (this.state === newState) return;
     this.previousState = this.state;
     this.state = newState;
+    this.stateType = this.states[newState]?.type || "stand"; // default to stand
     this.frameIndex = 0;
     this.frameTimer = 0;
     this.justEnteredState = true;
@@ -397,10 +419,12 @@ class Character {
     attacker.lastHitMoveData = md;
 
     // Determine whether this should be an air hit
-    this.isAirborne = this.sprite.y > gfloor.y || (md.launch && md.launch === true);
+    this.isAirborne = (this.sprite.y > gfloor.y) || (this.stateType === "air") || (md.launch === true);
 
     this.frameIndex = 0;
     this.frameTimer = 0;
+    this.sprite.vel.x = 0;
+    this.sprite.vel.y = 0;
 
     if (this.isAirborne) {
       this.changeState("airHitstun");

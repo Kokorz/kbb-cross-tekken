@@ -444,7 +444,7 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
             this.sprite.vel.x *= 0.95;
 
             // Switch to air fall animation only once moving downward
-            if (this.sprite.vel.y > 0 && this.currentAnim !== "hurtAirFall") {
+            if (this.prevVelY < 0 && this.sprite.vel.y >= 0 && this.currentAnim !== "hurtAirFall") {
                 console.log(this.currentAnim);
                 this.setAnim("hurtAirFall");
                 console.log(this.currentAnim);
@@ -452,11 +452,14 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
                 this.frameTimer = 0;
             }
 
+            this.prevVelY = this.sprite.vel.y;
+
             // Advance hurt animation only while in active hitstun
             if (this.hitStunTimer > 0) {
                 this.advanceFrame();
                 this.hitStunTimer--;
             }
+
 
             // Landing detection
             if (this.sprite.y >= gfloor.y) {
@@ -464,13 +467,165 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
                 this.sprite.vel.x = 0;
                 this.sprite.vel.y = 0;
 
+                // Determine landing face direction
+                if (this.currentAnim === "hurtAirFall" ||
+                    this.currentAnim === "hurtAirStun") {
+                    // Default assumption: hurtAirStun ends face-up
+                    this.airLandingFace = "up";
+                }
+
                 // Transition depending on vertical speed or knockback
-                if (this.knockback.y > 5) {
+                if (this.knockback.y > -2) {
                     this.changeState("knockdown");
                 } else {
-                    this.changeState("groundBounce"); // optional
+                    this.changeState("groundbounce"); // optional
                 }
             }
+            return;
+
+        case "groundbounce":
+            if (this.justEnteredState) {
+
+                // PHASE 1: play knockdown animation first (matching landing orientation)
+                this.groundBouncePhase = "pre";
+                this.groundBouncePreTimer = 5;
+
+                if (this.airLandingFace === "up") {
+                    this.setAnim("knockdownFaceUp");
+                } else {
+                    this.setAnim("knockdownFaceDown");
+                }
+
+                this.frameIndex = 0;
+                this.frameTimer = 0;
+
+                // During prephase: no hop yet
+                this.sprite.vel.x *= 0.4;
+                this.sprite.vel.y = 0;
+
+                this.justEnteredState = false;
+            }
+
+            // Shared hitstop
+            if (globalHitPause > 0) return;
+
+
+            // PHASE 1 — play knockdown animation first
+
+            if (this.groundBouncePhase === "pre") {
+
+                // Stay stuck to ground
+                this.sprite.y = gfloor.y;
+
+                // Slight sliding movement if desired
+                this.sprite.x += this.sprite.vel.x;
+                this.sprite.vel.x *= 0.9;
+
+                // Animate knockdown pose
+                this.advanceFrame();
+
+                // Countdown to bounce
+                this.groundBouncePreTimer--;
+                if (this.groundBouncePreTimer <= 0) {
+
+                    // Switch to actual bounce phase
+                    this.groundBouncePhase = "bounce";
+
+                    // Select opposite-facing bounce animation
+                    if (this.airLandingFace === "up") {
+                        this.setAnim("groundbounceToFaceDown");
+                    } else {
+                        this.setAnim("groundbounceToFaceUp");
+                    }
+
+                    this.frameIndex = 0;
+                    this.frameTimer = 0;
+
+                    // Start upward bounce hop
+                    this.sprite.vel.y = this.knockback.y * 0.5; // upward bounce
+                    this.sprite.vel.x *= 0.6;
+                }
+
+                return;
+            }
+
+            // PHASE 2 — perform bounce animation
+            if (this.groundBouncePhase === "bounce") {
+
+                // Apply motion
+                this.sprite.x += this.sprite.vel.x;
+                this.sprite.y += this.sprite.vel.y;
+
+                // Gravity
+                this.sprite.vel.y += 0.08;
+
+                // Advance animation
+                this.advanceFrame();
+
+                // Check landing after bounce
+                if (this.sprite.y >= gfloor.y) {
+                    this.sprite.y = gfloor.y;
+                    this.sprite.vel.x = 0;
+                    this.sprite.vel.y = 0;
+
+                    // Flip landing orientation for final knockdown animation
+                    this.airLandingFace = (this.airLandingFace === "up" ? "down" : "up");
+
+                    // Now enter final knockdown (opposite face)
+                    this.changeState("knockdown");
+                    return;
+                }
+
+                return;
+            }
+
+            return;
+
+        case "knockdown":
+            if (this.justEnteredState) {
+
+                // Choose animation based on last orientation
+                if (this.airLandingFace === "up") {
+                    this.setAnim("knockdownFaceUp");
+                } else {
+                    this.setAnim("knockdownFaceDown");
+                }
+
+                this.frameIndex = 0;
+                this.frameTimer = 0;
+                this.knockdownTimer = 0;
+
+                // Knockdown slide
+                this.sprite.vel.x *= 0.4;  // reduced slide
+                this.sprite.vel.y = 0;
+
+                this.justEnteredState = false;
+            }
+
+            if (globalHitPause > 0) return;
+
+            // Slide effect
+            this.sprite.x += this.sprite.vel.x;
+
+            // Knockdown friction
+            this.sprite.vel.x *= 0.85;
+
+            // Stay on ground
+            this.sprite.y = gfloor.y;
+
+            // Advance looping knockdown animation
+            this.advanceFrame();
+
+            // Knockdown duration timer
+            if (!this.knockdownTimer) this.knockdownTimer = 60; // 1 second of being down
+            this.knockdownTimer--;
+
+            // Timer expired → allow tech/wakeup later
+            if (this.knockdownTimer <= 0) {
+                this.changeState("idle");
+                this.knockdownTimer = 0;
+            }
+
             return;
 
     }

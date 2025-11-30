@@ -275,8 +275,8 @@
         { "image": "chr_gli/gli_hurt_airN_002.png", "duration": 3, "offset": [6,16] }
       ],
       "defaultBoxes": [
-        {"type": "pushbox", "x": -90, "y": 0, "w": 110, "h": -320},
-        {"type": "hurtbox", "x": -120, "y": 0, "w": 180, "h": -400}
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
       ]
     },
     "hurtAirFall": {
@@ -289,50 +289,60 @@
         { "image": "chr_gli/gli_hurt_airN_006.png", "duration": 3, "offset": [6,16] }
       ],
       "defaultBoxes": [
-        {"type": "pushbox", "x": -90, "y": 0, "w": 110, "h": -320},
-        {"type": "hurtbox", "x": -120, "y": 0, "w": 180, "h": -400}
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
       ]
     },
-    "knockdownNormal": {
+    "knockdownFaceUp": {
       "loop": true,
-      "loopStart": 2,
       "frames": [
-        { "image": "chr_gli/gli_hurt_airN_003.png", "duration": 3, "offset": [6,16] },
-        { "image": "chr_gli/gli_hurt_airN_004.png", "duration": 3, "offset": [6,16] },
-        { "image": "chr_gli/gli_hurt_airN_005.png", "duration": 3, "offset": [6,16] },
-        { "image": "chr_gli/gli_hurt_airN_006.png", "duration": 3, "offset": [6,16] }
+        { "image": "chr_gli/gli_hurt_knockdown_000.png", "duration": 3, "offset": [-5,2] }
       ],
       "defaultBoxes": [
-        {"type": "pushbox", "x": -90, "y": 0, "w": 110, "h": -320},
-        {"type": "hurtbox", "x": -120, "y": 0, "w": 180, "h": -400}
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
       ]
     },
-    "groundbounce": {
+    "groundbounceToFaceDown": {
       "loop": true,
-      "loopStart": 2,
+      "loopStart": 5,
       "frames": [
-        { "image": "chr_gli/gli_hurt_airN_003.png", "duration": 3, "offset": [6,16] },
-        { "image": "chr_gli/gli_hurt_airN_004.png", "duration": 3, "offset": [6,16] },
-        { "image": "chr_gli/gli_hurt_airN_005.png", "duration": 3, "offset": [6,16] },
-        { "image": "chr_gli/gli_hurt_airN_006.png", "duration": 3, "offset": [6,16] }
+        { "image": "chr_gli/gli_hurt_airS_spin_001.png", "duration": 3, "offset": [-8,16] },
+        { "image": "chr_gli/gli_hurt_airS_spin_002.png", "duration": 3, "offset": [-8,16] },
+        { "image": "chr_gli/gli_hurt_airS_spin_003.png", "duration": 3, "offset": [-8,16] },
+        { "image": "chr_gli/gli_hurt_airS_spin_004.png", "duration": 3, "offset": [-8,16] },
+        { "image": "chr_gli/gli_hurt_airS_spin_005.png", "duration": 3, "offset": [-8,16] },
+        { "image": "chr_gli/gli_hurt_knockdown_001.png", "duration": 5, "offset": [1,0] }
       ],
       "defaultBoxes": [
-        {"type": "pushbox", "x": -90, "y": 0, "w": 110, "h": -320},
-        {"type": "hurtbox", "x": -120, "y": 0, "w": 180, "h": -400}
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
       ]
     },
-    "knockdownGroundbounce": {
+    "knockdownFaceDown": {
       "loop": true,
-      "loopStart": 2,
       "frames": [
-        { "image": "chr_gli/gli_hurt_airN_003.png", "duration": 3, "offset": [6,16] },
-        { "image": "chr_gli/gli_hurt_airN_004.png", "duration": 3, "offset": [6,16] },
-        { "image": "chr_gli/gli_hurt_airN_005.png", "duration": 3, "offset": [6,16] },
-        { "image": "chr_gli/gli_hurt_airN_006.png", "duration": 3, "offset": [6,16] }
+        { "image": "chr_gli/gli_hurt_knockdown_002.png", "duration": 3, "offset": [0,2] }
       ],
       "defaultBoxes": [
-        {"type": "pushbox", "x": -90, "y": 0, "w": 110, "h": -320},
-        {"type": "hurtbox", "x": -120, "y": 0, "w": 180, "h": -400}
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "groundbounceToFaceUp": {
+      "loop": true,
+      "loopStart": 5,
+      "frames": [
+        { "image": "chr_gli/gli_hurt_airS_spin_005.png", "duration": 3, "offset": [8,16] },
+        { "image": "chr_gli/gli_hurt_airS_spin_006.png", "duration": 3, "offset": [8,16] },
+        { "image": "chr_gli/gli_hurt_airS_spin_007.png", "duration": 3, "offset": [8,16] },
+        { "image": "chr_gli/gli_hurt_airS_spin_000.png", "duration": 3, "offset": [8,16] },
+        { "image": "chr_gli/gli_hurt_airS_spin_001.png", "duration": 3, "offset": [8,16] },
+        { "image": "chr_gli/gli_hurt_knockdown_001.png", "duration": 5, "offset": [1,0] }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
       ]
     }
   }
