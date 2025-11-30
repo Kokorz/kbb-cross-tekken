@@ -5,15 +5,20 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
 
     switch (this.state) {
         case "idle":
+            // Record state before input actions
+            const before = this.state;
+
+            // Allow attack transitions (and others)
             this.handleButtonTaps();
+
+            // If a new state was selected, stop running idle logic immediately
+            if (this.state !== before) return;
 
             if (this.justEnteredState) {
                 this.setAnim(this.previousState === "crouch" ? "croToSta" : "idle");
                 this.transitioning = this.previousState === "crouch";
                 this.justEnteredState = false;
             }
-
-            if (this.state !== "idle") return;
 
             if (this.transitioning) {
                 const anim = this.anims[this.currentAnim];
@@ -28,8 +33,8 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
             // Move to crouch
             if (d.y === -1) {
                 this.changeState("crouch");
+                return;
             }
-
 
             // Move to jump
             if (d.y === 1) {

@@ -397,12 +397,15 @@ class Character {
     attacker.lastHitMoveData = md;
 
     // Determine whether this should be an air hit
-    this.isAirborne = this.sprite.y < gfloor.y || (md.launch && md.launch === true);
+    this.isAirborne = this.sprite.y > gfloor.y || (md.launch && md.launch === true);
+
+    this.frameIndex = 0;
+    this.frameTimer = 0;
 
     if (this.isAirborne) {
-        this.changeState("airHitstun");
+      this.changeState("airHitstun");
     } else {
-        this.changeState("hitstun");
+      this.changeState("hitstun");
     }
   }
 
