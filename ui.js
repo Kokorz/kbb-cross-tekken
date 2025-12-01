@@ -39,16 +39,16 @@ class HUD {
     let hpRatio1 = constrain(this.p1.health / this.p1.maxHealth, 0, 1);
     fill(60);
     noStroke();
-    rect(margin, margin, barWidth, barHeight, 3); // move to top
+    rect(margin, margin, barWidth, barHeight, 5); // move to top
     fill(50, 90, 255);
-    rect(margin, margin, barWidth * hpRatio1, barHeight, 3);
+    rect(margin, margin, barWidth * hpRatio1, barHeight, 5);
 
     // Player 2 (right-top)
     let hpRatio2 = constrain(this.p2.health / this.p1.maxHealth, 0, 1);
     fill(60);
-    rect(width - barWidth - margin, margin, barWidth, barHeight, 3);
+    rect(width - barWidth - margin, margin, barWidth, barHeight, 5);
     fill(50, 90, 255);
-    rect(width - barWidth - margin, margin, barWidth * hpRatio2, barHeight, 3);
+    rect(width - barWidth - margin, margin, barWidth * hpRatio2, barHeight, 5);
   }
 
   displayTimer() {

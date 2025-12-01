@@ -3,6 +3,9 @@
 let data_str, data_gli;
 let str_loadedAnimations = {};
 let gli_loadedAnimations = {};
+let data_fx;
+let visualEffects = {};
+let soundEffects = {};
 let p1, p2, gfloor;
 
 let bgOffsetX = 0,
@@ -11,6 +14,10 @@ let bgOffsetX = 0,
 let UI;
 
 let globalHitPause = 0;
+
+const activeVFX = [];
+const activeSFX = [];
+
 
 // numpad direction grid
 // 7 8 9
@@ -81,16 +88,23 @@ const KEYBINDINGS_P2 = {
 
 function preload() {
   defaultImageScale(1);
+  soundFormats('wav', 'ogg');
   data_str = loadJSON("data/data_str.json");
   data_gli = loadJSON("data/data_gli.json");
+  data_fx = loadJSON("data/data_fx.json");
 }
 
 function setup() {
 
   str_loadedAnimations = loadAnimations(data_str);
   gli_loadedAnimations = loadAnimations(data_gli);
+  loadFXJSON(data_fx);
+
+  userStartAudio();
 
   new Canvas(256, 144);
+  noSmooth();
+  angleMode(DEGREES);
   displayMode(CENTER, PIXELATED, 8);
   frameRate(60);
 
@@ -113,17 +127,31 @@ function setup() {
 
 function loadAnimations(json) {
   let anims = {};
+
   for (const [name, data] of Object.entries(json.animations)) {
     let lastMoveData = data.defaultMoveData ?? null;
 
     const frames = data.frames.map((f) => {
       if (f.movedata) lastMoveData = f.movedata;
+
+      // Preserve the modifier object
+      const modifier = f.modifier ?? {};
+
       return {
         img: loadImage(f.image),
+
         duration: f.duration ?? json.defaultDuration,
         boxes: f.boxes ?? [],
-        offset: f.offset ?? [0, 0],
+
         movedata: lastMoveData,
+
+        // Keep modifier inside the frame for render()
+        modifier: {
+          offset: modifier.offset ?? [0, 0],
+          scale: modifier.scale ?? [1, 1],
+          rotation: modifier.rotation ?? 0,
+          blendMode: modifier.blendMode ?? null
+        }
       };
     });
 
@@ -131,10 +159,60 @@ function loadAnimations(json) {
       frames,
       loopStart: data.loopStart ?? 0,
       playOnce: data.playOnce ?? !data.loop,
-      defaultBoxes: data.defaultBoxes ?? [],
+      defaultBoxes: data.defaultBoxes ?? []
     };
   }
+
   return anims;
+}
+
+function loadFXJSON(json) {
+  // Visual FX
+  for (const [key, data] of Object.entries(json.visual)) {
+    const frames = data.frames.map(f => {
+      const mod = f.modifier ?? {};
+      return {
+        img: loadImage(f.image),
+        duration: f.duration ?? 1,
+        offset: mod.offset ?? [0, 0],
+        scale: mod.scale ?? [1, 1],
+        rotation: mod.rotation ?? 0,
+        blendMode: mod.blendMode ?? ADD,
+        flipX: mod.flipX ?? false,
+        flipY: mod.flipY ?? false
+      };
+    });
+
+    // Read optional globalModifier from JSON
+    const globalMod = data.globalModifier ?? {};
+
+    visualEffects[key] = {
+      frames,
+      playOnce: data.playOnce ?? true,
+      loopStart: data.loopStart ?? 0,
+      globalModifier: {
+        offset: globalMod.offset ?? [0, 0],
+        scale: globalMod.scale ?? [1, 1],
+        rotation: globalMod.rotation ?? 0,
+        blendMode: globalMod.blendMode ?? null,
+        flipX: globalMod.flipX ?? false,
+        flipY: globalMod.flipY ?? false
+
+      }
+    };
+  }
+
+  // Sound FX
+  for (const [key, def] of Object.entries(json.sound)) {
+    soundEffects[key] = {
+      file: def.file,
+      volume: def.volume ?? 1,
+      pitch: def.pitch ?? 1,
+      sound: loadSound(def.file) // preload here
+    };
+  }
+
+  return { visualEffects, soundEffects };
 }
 
 function update() {
@@ -150,6 +228,8 @@ function update() {
     globalHitPause--;
     return; // literally freeze the entire game world except timers
   }
+
+  updateFX();
 }
 
 function draw() {
@@ -161,6 +241,9 @@ function draw() {
   drawInfiniteFloor();
   p1.render();
   p2.render();
+
+  renderVFX();
+
   camera.off();
   UI.display();
 }
@@ -260,6 +343,61 @@ function drawInfiniteFloor() {
     const x = i * tileWidth;
     rect(x, gfloor.y, tileWidth, tileHeight);
   }
+}
+
+// Effects!
+function updateFX() {
+  for (let i = activeVFX.length - 1; i >= 0; i--) {
+    const vfx = activeVFX[i];
+    vfx.update();
+    if (vfx.finished) activeVFX.splice(i, 1);
+  }
+
+  for (let i = activeSFX.length - 1; i >= 0; i--) {
+    const sfx = activeSFX[i];
+    sfx.update();
+    if (sfx.finished) activeSFX.splice(i, 1);
+  }
+}
+
+function renderVFX() {
+  for (const vfx of activeVFX) vfx.render();
+}
+
+function spawnFX({ x, y, follow = null, visual = [], sound = [] }) {
+  // Visual
+  for (const vfxKey of visual) {
+    const vfxDef = visualEffects[vfxKey];
+    if (!vfxDef) continue;
+
+    const globalModifier = vfxDef.globalModifier ?? {};
+
+    const vfx = new VFX({
+      anim: vfxDef,
+      x: x,
+      y: y,
+      follow: follow,
+      followTime: vfxDef.followTime ?? 0,
+      globalModifier: globalModifier
+    });
+
+    activeVFX.push(vfx);
+  }
+
+  // Sound
+  for (const sfxKey of sound) {
+    const sfxDef = soundEffects[sfxKey];
+    if (!sfxDef) continue;
+
+    const sfx = new SFX({
+      soundObj: sfxDef,      // pass the whole object
+      volume: sfxDef.volume,  // optional override
+      pitch: sfxDef.pitch     // optional override
+    });
+
+    activeSFX.push(sfx);
+  }
+
 }
 
 //  INPUT / MOTION 

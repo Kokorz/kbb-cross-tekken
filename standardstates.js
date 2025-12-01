@@ -437,11 +437,11 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
             // Horizontal drag
             this.sprite.vel.x *= 0.95;
 
+            console.log(this.sprite.vel.y);
+
             // Switch to air fall animation only once moving downward
             if (this.prevVelY < 0 && this.sprite.vel.y >= 0 && this.currentAnim !== "hurtAirFall") {
-                console.log(this.currentAnim);
                 this.setAnim("hurtAirFall");
-                console.log(this.currentAnim);
                 this.frameIndex = 0;
                 this.frameTimer = 0;
             }
@@ -450,10 +450,10 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
 
             // Advance hurt animation only while in active hitstun
             if (this.hitStunTimer > 0) {
-                this.advanceFrame();
                 this.hitStunTimer--;
             }
 
+            this.advanceFrame();
 
             // Landing detection
             if (this.sprite.y >= gfloor.y) {

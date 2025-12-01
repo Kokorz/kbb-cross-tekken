@@ -126,7 +126,7 @@ class Character {
     //   // Add more as needed
     // ];
 
-    
+
   }
 
   changeState(newState) {
@@ -237,10 +237,10 @@ class Character {
   handleInput() {
     const now = frameCount;
 
-    // ---- Compute current direction from table-driven system ----
+    // - Compute current direction from table-driven system -
     const dir = this.getCurrentDirection(); // uses DIR_FROM_AXES
 
-    // ---- Poll buttons for this frame ----
+    // - Poll buttons for this frame -
     const curBtn = {
       lp: keyIsDown(this.keybindings.lp),
       rp: keyIsDown(this.keybindings.rp),
@@ -399,15 +399,47 @@ class Character {
     const frame = anim.frames[this.frameIndex];
     if (!frame) return;
 
-    const offsetX = frame.offset?.[0] || 0; // do NOT flip
-    const offsetY = frame.offset?.[1] || 0;
+    // Grab modifier object
+    const mod = frame.modifier ?? {};
 
+    // Offsets (do not flip)
+    const offsetX = mod.offset?.[0] || 0;
+    const offsetY = mod.offset?.[1] || 0;
+
+    // Flip
     const flip = this.facing !== this.defaultFacing;
 
+    // Frame transforms
+    const rot = mod.rotation ?? 0;             // degrees, since angleMode(DEGREES)
+    const sx = mod.scale?.[0] ?? 1;
+    const sy = mod.scale?.[1] ?? 1;
+
+    // Apply flip to X scale only
+    const scaleX = flip ? -sx : sx;
+    const scaleY = sy;
+
+    // Blend mode: frame > object > NORMAL
+    const blend = mod.blendMode ?? this.blendMode ?? NORMAL;
+
     push();
+
+    blendMode(blend);
+
+    // Anchor at sprite.x / sprite.y
     translate(this.sprite.x, this.sprite.y + offsetY);
-    if (flip) scale(-1, 1);
-    image(frame.img, -frame.img.width / 2 + offsetX, -frame.img.height);
+
+    // Rotate around anchor
+    rotate(rot);
+
+    // Scale after rotate
+    scale(scaleX, scaleY);
+
+    // Draw so anchor is midpoint bottom of the sprite
+    const drawX = -frame.img.width / 2 + offsetX;
+    const drawY = -frame.img.height;
+
+    image(frame.img, drawX, drawY);
+
     pop();
 
     this.drawBoxes();
@@ -427,42 +459,42 @@ class Character {
 
   takeHit(attacker) {
     const md = attacker.getCurrentMoveData();
-    if (!md) return; // safety fallback
+    if (!md) return;
 
-    this.currentAttackResult = "hit"; // <-- update attack result
+    this.currentAttackResult = "hit";
 
-    // Damage
+    //  Damage & Hit Logic 
     this.health -= md.damage || 0;
     if (this.health < 0) this.health = 0;
 
-    // Shared hitstop (global freeze)
     globalHitPause = md.hit_pause || 0;
-
-    // Per-character hitstun
     this.hitStunTimer = md.hit_stun || 0;
 
-    // Knockback (applies once after shared hitstop ends)
     this.knockback = {
-      x: (md.hit_knockback && md.hit_knockback[0]) || 0,
-      y: (md.hit_knockback && md.hit_knockback[1]) || 0,
+      x: md.hit_knockback?.[0] || 0,
+      y: md.hit_knockback?.[1] || 0,
     };
     this.knockbackApplied = false;
 
-    // Store hint for choosing hurt anim
-    this.incomingHitAnimType = md.hit_animtype_ground || null;
-
-    // Prevent attacker from re-hitting this movedata until it changes
     attacker.canHitThisSequence = false;
     attacker.lastHitMoveData = md;
 
-    // Determine whether this should be an air hit
-    this.isAirborne = (this.sprite.y > gfloor.y) || (this.stateType === "air") || (md.launch === true);
+    this.isAirborne = (this.sprite.y > gfloor.y) || this.stateType === "air" || md.launch === true;
 
     this.frameIndex = 0;
     this.frameTimer = 0;
     this.sprite.vel.x = 0;
     this.sprite.vel.y = 0;
 
+    //  FX SPAWN based on strength 
+    spawnFX({
+      x: this.sprite.x,
+      y: this.sprite.y,
+      visual: [md.strength === "Heavy" ? "spark_hitH" : md.strength === "Medium" ? "spark_hitM" : "spark_hitL"],
+      sound: [md.strength === "Heavy" ? "hitSH" : md.strength === "Medium" ? "hitM" : "hitL"]
+    });
+
+    //  Change State 
     if (this.isAirborne) {
       this.changeState("airHitstun");
     } else {
@@ -471,36 +503,39 @@ class Character {
   }
 
   takeBlock(attacker, { movedata }) {
-    const gf = movedata.guard_flag;
-
     globalHitPause = movedata.block_pause || 0;
 
     const standInput = this.isHoldingBack();
     const crouchInput = this.isHoldingDownBack();
 
     let blockCorrect = false;
-    if (standInput && (gf === "High" || gf === "Mid")) blockCorrect = true;
-    if (crouchInput && gf === "Low") blockCorrect = true;
+    if (standInput && (movedata.guard_flag === "High" || movedata.guard_flag === "Mid")) blockCorrect = true;
+    if (crouchInput && movedata.guard_flag === "Low") blockCorrect = true;
 
     if (!blockCorrect) {
-      this.takeHit(attacker); // <-- automatically sets currentAttackResult = "hit"
+      this.takeHit(attacker);
       return;
     }
 
-    this.currentAttackResult = "block"; // <-- update attack result
+    this.currentAttackResult = "block";
 
-    // Store pending block state for the next frame
     this._pendingGuardState = crouchInput ? "guardLo" : "guardHi";
-
-    // Store blockstun info
     this._pendingBlockStunTimer = movedata.block_stun || 0;
     this._pendingKnockback = {
-      x: (movedata.block_knockback && movedata.block_knockback[0]) || 0,
-      y: (movedata.block_knockback && movedata.block_knockback[1]) || 0,
+      x: movedata.block_knockback?.[0] || 0,
+      y: movedata.block_knockback?.[1] || 0,
     };
     this.knockbackApplied = false;
 
-    // FORCE the correct guard state so blockstun logic can run
+    // FX SPAWN (same for all blocks) 
+    spawnFX({
+      x: this.sprite.x,
+      y: this.sprite.y,
+      visual: ["spark_block"],
+      sound: ["block1"]
+    });
+
+    // FORCE guard state immediately
     if (crouchInput) {
       if (this.state !== "guardLo") this.changeState("guardLo");
     } else {
@@ -525,6 +560,21 @@ class Character {
     this.handleCancels();
     this.handleStandardStates();
     if (this[`state_${this.state}`]) this[`state_${this.state}`]();
+
+    const anim = this.anims[this.currentAnim || this.state];
+    if (anim) {
+      const frame = anim.frames[this.frameIndex];
+      if (frame?.effects) {
+        spawnFX({
+          x: this.sprite.x,
+          y: this.sprite.y,
+          follow: this, // FX gets attached to character if followTime > 0!
+          visual: frame.effects.visual ?? [],
+          sound: frame.effects.sound ?? []
+        });
+      }
+    }
+
     this.sprite.x = floor(this.sprite.x);
     this.sprite.y = floor(this.sprite.y);
   }
