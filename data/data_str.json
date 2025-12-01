@@ -234,12 +234,12 @@
     },
     "hurtStandHi": {
       "loop": true,
-      "loopStart": 4,
+      "loopStart": 3,
       "frames": [
-        { "image": "chr_str/str_hurt_standHi_000.png", "duration": 3, "offset": [26,6] },
-        { "image": "chr_str/str_hurt_standHi_001.png", "duration": 3, "offset": [26,6] },
-        { "image": "chr_str/str_hurt_standHi_002.png", "duration": 3, "offset": [26,6] },
-        { "image": "chr_str/str_hurt_standHi_003.png", "duration": 3, "offset": [26,6] }
+        { "image": "chr_str/str_hurt_standHi_000.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_standHi_001.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_standHi_002.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_standHi_003.png", "duration": 3, "offset": [-32,6] }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
@@ -248,12 +248,12 @@
     },
     "hurtStandLo": {
       "loop": true,
-      "loopStart": 4,
+      "loopStart": 3,
       "frames": [
-        { "image": "chr_str/str_hurt_standLo_000.png", "duration": 3, "offset": [26,6] },
-        { "image": "chr_str/str_hurt_standLo_001.png", "duration": 3, "offset": [26,6] },
-        { "image": "chr_str/str_hurt_standLo_002.png", "duration": 3, "offset": [26,6] },
-        { "image": "chr_str/str_hurt_standLo_003.png", "duration": 3, "offset": [26,6] }
+        { "image": "chr_str/str_hurt_standLo_000.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_standLo_001.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_standLo_002.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_standLo_003.png", "duration": 3, "offset": [-32,6] }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
@@ -262,12 +262,12 @@
     },
     "hurtCrouch": {
       "loop": true,
-      "loopStart": 4,
+      "loopStart": 3,
       "frames": [
-        { "image": "chr_str/str_hurt_crouch_000.png", "duration": 3, "offset": [26,6] },
-        { "image": "chr_str/str_hurt_crouch_001.png", "duration": 3, "offset": [26,6] },
-        { "image": "chr_str/str_hurt_crouch_002.png", "duration": 3, "offset": [26,6] },
-        { "image": "chr_str/str_hurt_crouch_003.png", "duration": 3, "offset": [26,6] }
+        { "image": "chr_str/str_hurt_crouch_000.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_crouch_001.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_crouch_002.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_crouch_003.png", "duration": 3, "offset": [-32,6] }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
@@ -278,9 +278,9 @@
       "loop": true,
       "loopStart": 1,
       "frames": [
-        { "image": "chr_str/str_hurt_airN_000.png", "duration": 3 },
-        { "image": "chr_str/str_hurt_airN_001.png", "duration": 3 },
-        { "image": "chr_str/str_hurt_airN_002.png", "duration": 3 }
+        { "image": "chr_str/str_hurt_airN_000.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_airN_001.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_airN_002.png", "duration": 3, "offset": [-32,6] }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
@@ -291,10 +291,62 @@
       "loop": true,
       "loopStart": 2,
       "frames": [
-        { "image": "chr_str/str_hurt_airN_003.png", "duration": 3 },
-        { "image": "chr_str/str_hurt_airN_004.png", "duration": 3 },
-        { "image": "chr_str/str_hurt_airN_005.png", "duration": 3 },
-        { "image": "chr_str/str_hurt_airN_006.png", "duration": 3 }
+        { "image": "chr_str/str_hurt_airN_003.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_airN_004.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_airN_005.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_airN_006.png", "duration": 3, "offset": [-32,6] }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "knockdownFaceUp": {
+      "loop": true,
+      "frames": [
+        { "image": "chr_str/str_hurt_knockdown_000.png", "duration": 3 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "groundbounceToFaceDown": {
+      "loop": true,
+      "loopStart": 5,
+      "frames": [
+        { "image": "chr_str/str_hurt_airS_spin_001.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_airS_spin_002.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_airS_spin_003.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_airS_spin_004.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_airS_spin_005.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_knockdown_001.png", "duration": 5 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "knockdownFaceDown": {
+      "loop": true,
+      "frames": [
+        { "image": "chr_str/str_hurt_knockdown_002.png", "duration": 3 }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "groundbounceToFaceUp": {
+      "loop": true,
+      "loopStart": 5,
+      "frames": [
+        { "image": "chr_str/str_hurt_airS_spin_005.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_airS_spin_006.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_airS_spin_007.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_airS_spin_000.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_airS_spin_001.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_knockdown_001.png", "duration": 5, "offset": [1,0] }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},

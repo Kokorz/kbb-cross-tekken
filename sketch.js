@@ -74,8 +74,8 @@ const KEYBINDINGS_P2 = {
   left: 65, // a
   right: 68, // d
   lp: 66, // b
-  lk: 78, // n
-  rp: 77, // m
+  rp: 78, // n
+  lk: 77, // m
   rk: 188, // comma
 };
 
@@ -501,7 +501,7 @@ class Stray extends Character {
       // From base states to 5RP
       { fromState: ["idle", "walk", "run"], buttons: ["rp"], to: "nmlAtk5RP", minFrame: 0 },
       // From base states to 5LK
-      { fromState: ["idle", "walk", "run"], buttons: ["kp"], to: "nmlAtk5LK", minFrame: 0 },
+      { fromState: ["idle", "walk", "run"], buttons: ["lk"], to: "nmlAtk5LK", minFrame: 0 },
 
       // Example: cancel 5LP → 5RP (only if hit)
       { fromState: ["nmlAtk5LP"], result: "hit", buttons: ["rp"], to: "nmlAtk5RP" },
@@ -580,6 +580,73 @@ class Glitch extends Character {
       // console.log(animName, frames.map(f => !!f.img));
     }
 
+    this.CANCEL_TABLE = [
+      // From base states to 5LP
+      { fromState: ["idle", "walk", "run"], buttons: ["lp"], to: "nmlAtk5LP", minFrame: 0 },
+      // From base states to 5RP
+      { fromState: ["idle", "walk", "run"], buttons: ["rp"], to: "nmlAtk5RP", minFrame: 0 },
+      // From base states to 5LK
+      { fromState: ["idle", "walk", "run"], buttons: ["lk"], to: "nmlAtk5LK", minFrame: 0 },
+
+      // Example: cancel 5LP → 5RP (only if hit)
+      { fromState: ["nmlAtk5LP"], result: "hit", buttons: ["rp"], to: "nmlAtk5RP" },
+    ];
+
+
     this.changeState("idle");
+  }
+
+  state_nmlAtk5LP() {
+    if (this.justEnteredState) {
+      this.setAnim("nmlAtk5LP");
+      this.frameIndex = 0;
+      this.frameTimer = 0;
+      this.sprite.vel.x = 0;
+      this.justEnteredState = false;
+    }
+
+    if (typeof globalHitPause !== "undefined" && globalHitPause > 0) {
+      return;
+    }
+
+    this.advanceFrame("nmlAtk5LP");
+    const anim = this.anims.nmlAtk5LP;
+    if (this.frameIndex >= anim.frames.length - 1) this.changeState("idle");
+  }
+
+  state_nmlAtk5RP() {
+    if (this.justEnteredState) {
+      this.setAnim("nmlAtk5RP");
+      this.frameIndex = 0;
+      this.frameTimer = 0;
+      this.sprite.vel.x = 0;
+      this.justEnteredState = false;
+    }
+
+    if (typeof globalHitPause !== "undefined" && globalHitPause > 0) {
+      return;
+    }
+
+    this.advanceFrame("nmlAtk5RP");
+    const anim = this.anims.nmlAtk5LP;
+    if (this.frameIndex >= anim.frames.length - 1) this.changeState("idle");
+  }
+
+  state_nmlAtk5LK() {
+    if (this.justEnteredState) {
+      this.setAnim("nmlAtk5LK");
+      this.frameIndex = 0;
+      this.frameTimer = 0;
+      this.sprite.vel.x = 0;
+      this.justEnteredState = false;
+    }
+
+    if (typeof globalHitPause !== "undefined" && globalHitPause > 0) {
+      return;
+    }
+
+    this.advanceFrame("nmlAtk5LK");
+    const anim = this.anims.nmlAtk5LK;
+    if (this.frameIndex >= anim.frames.length - 1) this.changeState("idle");
   }
 }
