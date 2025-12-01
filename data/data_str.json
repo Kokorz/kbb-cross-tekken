@@ -315,11 +315,11 @@
       "loop": true,
       "loopStart": 5,
       "frames": [
-        { "image": "chr_str/str_hurt_airS_spin_001.png", "duration": 3, "offset": [-32,6] },
-        { "image": "chr_str/str_hurt_airS_spin_002.png", "duration": 3, "offset": [-32,6] },
-        { "image": "chr_str/str_hurt_airS_spin_003.png", "duration": 3, "offset": [-32,6] },
-        { "image": "chr_str/str_hurt_airS_spin_004.png", "duration": 3, "offset": [-32,6] },
-        { "image": "chr_str/str_hurt_airS_spin_005.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_airS_spin_001.png", "duration": 3, "offset": [-40,6] },
+        { "image": "chr_str/str_hurt_airS_spin_002.png", "duration": 3, "offset": [-40,6] },
+        { "image": "chr_str/str_hurt_airS_spin_003.png", "duration": 3, "offset": [-40,6] },
+        { "image": "chr_str/str_hurt_airS_spin_004.png", "duration": 3, "offset": [-40,6] },
+        { "image": "chr_str/str_hurt_airS_spin_005.png", "duration": 3, "offset": [-40,6] },
         { "image": "chr_str/str_hurt_knockdown_001.png", "duration": 5 }
       ],
       "defaultBoxes": [
@@ -341,11 +341,11 @@
       "loop": true,
       "loopStart": 5,
       "frames": [
-        { "image": "chr_str/str_hurt_airS_spin_005.png", "duration": 3, "offset": [-32,6] },
-        { "image": "chr_str/str_hurt_airS_spin_006.png", "duration": 3, "offset": [-32,6] },
-        { "image": "chr_str/str_hurt_airS_spin_007.png", "duration": 3, "offset": [-32,6] },
-        { "image": "chr_str/str_hurt_airS_spin_000.png", "duration": 3, "offset": [-32,6] },
-        { "image": "chr_str/str_hurt_airS_spin_001.png", "duration": 3, "offset": [-32,6] },
+        { "image": "chr_str/str_hurt_airS_spin_005.png", "duration": 3, "offset": [-40,6] },
+        { "image": "chr_str/str_hurt_airS_spin_006.png", "duration": 3, "offset": [-40,6] },
+        { "image": "chr_str/str_hurt_airS_spin_007.png", "duration": 3, "offset": [-40,6] },
+        { "image": "chr_str/str_hurt_airS_spin_000.png", "duration": 3, "offset": [-40,6] },
+        { "image": "chr_str/str_hurt_airS_spin_001.png", "duration": 3, "offset": [-40,6] },
         { "image": "chr_str/str_hurt_knockdown_001.png", "duration": 5, "offset": [1,0] }
       ],
       "defaultBoxes": [
