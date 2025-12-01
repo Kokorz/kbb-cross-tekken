@@ -1,14 +1,20 @@
 class VFX {
-    constructor({ anim, x, y, follow = null, followTime = 0, globalModifier = {} }) {
+    constructor({ anim, x, y, follow = null, followTime = 0, globalModifier = {}, autoFlipFrom = null }) {
         this.anim = anim;
         this.frames = anim.frames;
         this.frameIndex = 0;
         this.frameTimer = 0;
 
+        // Starting position
+        this.baseX = x;
+        this.baseY = y;
         this.x = x;
         this.y = y;
+
         this.follow = follow;
         this.followTime = followTime;
+
+        this.autoFlipFrom = autoFlipFrom;
 
         this.finished = false;
 
@@ -25,10 +31,15 @@ class VFX {
     update() {
         if (this.finished) return;
 
+        // Follow logic
         if (this.follow && this.followTime > 0) {
             this.x = this.follow.sprite.x;
             this.y = this.follow.sprite.y;
             this.followTime--;
+        } else {
+            // If no follow, stick to baseX/baseY
+            this.x = this.baseX;
+            this.y = this.baseY;
         }
 
         const frame = this.frames[this.frameIndex];
@@ -51,32 +62,46 @@ class VFX {
         const frame = this.frames[this.frameIndex];
         if (!frame) return;
 
-        // Combine per-frame modifiers with global modifiers
-        const offsetX = (frame.offset?.[0] ?? 0) + (this.globalModifier.offset?.[0] ?? 0);
-        const offsetY = (frame.offset?.[1] ?? 0) + (this.globalModifier.offset?.[1] ?? 0);
+        // SCALE + FLIP
+        let sx = (frame.scale?.[0] ?? 1) * (this.globalModifier.scale?.[0] ?? 1);
+        let sy = (frame.scale?.[1] ?? 1) * (this.globalModifier.scale?.[1] ?? 1);
 
-        let scaleX = (frame.scale?.[0] ?? 1) * (this.globalModifier.scale?.[0] ?? 1);
-        let scaleY = (frame.scale?.[1] ?? 1) * (this.globalModifier.scale?.[1] ?? 1);
+        let autoFlipX = this.autoFlipFrom?.facing === -1;
+        const flipX = autoFlipX ^ (frame.flipX ?? false) ^ (this.globalModifier.flipX ?? false);
+        const flipY = (frame.flipY ?? false) ^ (this.globalModifier.flipY ?? false);
 
-        // Apply flips
-        if (frame.flipX ?? this.globalModifier.flipX) scaleX *= -1;
-        if (frame.flipY ?? this.globalModifier.flipY) scaleY *= -1;
+        if (flipX) sx *= -1;
+        if (flipY) sy *= -1;
 
+        // OFFSETS
+        let offsetX = (frame.offset?.[0] ?? 0) + (this.globalModifier.offset?.[0] ?? 0);
+        let offsetY = (frame.offset?.[1] ?? 0) + (this.globalModifier.offset?.[1] ?? 0);
+
+        if (flipX) offsetX = -offsetX;
+
+        // ROTATION + BLEND
         const rotation = (frame.rotation ?? 0) + (this.globalModifier.rotation ?? 0);
         const blend = frame.blendMode ?? this.globalModifier.blendMode ?? ADD;
 
+        const img = frame.img;
+        const w = img.width;
+        const h = img.height;
+
+        // DRAW
         push();
-        translate(this.x + offsetX, this.y + offsetY);
-        rotate(rotation);
-        scale(scaleX, scaleY);
         blendMode(blend);
 
-        imageMode(CENTER);
-        image(frame.img, 0, 0);
+        // Translate to position + offsets
+        translate(this.x + offsetX, this.y + offsetY);
+        rotate(rotation);
 
+        // Center anchor for rotation
+        push();
+        scale(sx, sy);
+        image(img, -w / 2, -h / 2);
+        pop();
         pop();
     }
-
 }
 
 

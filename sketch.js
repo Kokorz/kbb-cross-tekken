@@ -223,13 +223,12 @@ function update() {
   checkHits(p2, p1);
   resolvePush(p1, p2);
   resolvePush(p2, p1);
+  updateFX();
 
   if (globalHitPause > 0) {
     globalHitPause--;
     return; // literally freeze the entire game world except timers
   }
-
-  updateFX();
 }
 
 function draw() {
@@ -364,7 +363,7 @@ function renderVFX() {
   for (const vfx of activeVFX) vfx.render();
 }
 
-function spawnFX({ x, y, follow = null, visual = [], sound = [] }) {
+function spawnFX({ x, y, follow = null, visual = [], sound = [], autoFlipFrom = null }) {
   // Visual
   for (const vfxKey of visual) {
     const vfxDef = visualEffects[vfxKey];
@@ -378,7 +377,8 @@ function spawnFX({ x, y, follow = null, visual = [], sound = [] }) {
       y: y,
       follow: follow,
       followTime: vfxDef.followTime ?? 0,
-      globalModifier: globalModifier
+      globalModifier: globalModifier,
+      autoFlipFrom: autoFlipFrom
     });
 
     activeVFX.push(vfx);
@@ -547,7 +547,6 @@ function checkHits(attacker, defender) {
   }
 }
 
-
 function resolvePush(p1, p2) {
   let minOverlap = Infinity;
 
@@ -642,7 +641,7 @@ class Stray extends Character {
       { fromState: ["idle", "walk", "run"], buttons: ["lk"], to: "nmlAtk5LK", minFrame: 0 },
 
       // Example: cancel 5LP → 5RP (only if hit)
-      { fromState: ["nmlAtk5LP"], result: "hit", buttons: ["rp"], to: "nmlAtk5RP" },
+      { fromState: ["nmlAtk5LP"], result: ["hit","block"], buttons: ["rp"], to: "nmlAtk5RP" },
     ];
 
     this.changeState("idle");

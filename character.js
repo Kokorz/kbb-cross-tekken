@@ -461,7 +461,7 @@ class Character {
     const md = attacker.getCurrentMoveData();
     if (!md) return;
 
-    this.currentAttackResult = "hit";
+    attacker.currentAttackResult = "hit";
 
     //  Damage & Hit Logic 
     this.health -= md.damage || 0;
@@ -486,12 +486,30 @@ class Character {
     this.sprite.vel.x = 0;
     this.sprite.vel.y = 0;
 
+    //x and y pos
+    const atkHB = attacker.getCurrentHitboxes?.() || [];
+    const defHB = this.getCurrentHurtboxes?.() || [];
+    const hitPoint = this.fetchHitIntersection(atkHB, defHB);
+
+    const fxX = hitPoint ? hitPoint.x : this.sprite.x;
+    const fxY = hitPoint ? hitPoint.y : this.sprite.y;
+
+    //hitspark angle modifier calculation
+    let fxAngle = 0;
+    if (this.knockback.x !== 0 || this.knockback.y !== 0) {
+        fxAngle = degrees(atan2(-this.knockback.y, this.knockback.x));
+    }
+
     //  FX SPAWN based on strength 
     spawnFX({
-      x: this.sprite.x,
-      y: this.sprite.y,
+      x: fxX,
+      y: fxY,
       visual: [md.strength === "Heavy" ? "spark_hitH" : md.strength === "Medium" ? "spark_hitM" : "spark_hitL"],
-      sound: [md.strength === "Heavy" ? "hitSH" : md.strength === "Medium" ? "hitM" : "hitL"]
+      sound: [md.strength === "Heavy" ? "hitSH" : md.strength === "Medium" ? "hitH" : "hitL"],
+      autoFlipFrom: attacker,
+      follow: true,
+      followTime: 1,
+      globalModifier: {rotation: fxAngle}
     });
 
     //  Change State 
@@ -517,7 +535,7 @@ class Character {
       return;
     }
 
-    this.currentAttackResult = "block";
+    attacker.currentAttackResult = "block";
 
     this._pendingGuardState = crouchInput ? "guardLo" : "guardHi";
     this._pendingBlockStunTimer = movedata.block_stun || 0;
@@ -532,7 +550,8 @@ class Character {
       x: this.sprite.x,
       y: this.sprite.y,
       visual: ["spark_block"],
-      sound: ["block1"]
+      sound: ["block1"],
+      autoFlipFrom: attacker
     });
 
     // FORCE guard state immediately
@@ -541,6 +560,25 @@ class Character {
     } else {
       if (this.state !== "guardHi") this.changeState("guardHi");
     }
+  }
+
+  fetchHitIntersection(attackerBoxes, defenderBoxes) {
+    for (const hb of attackerBoxes) {
+      for (const ub of defenderBoxes) {
+        const dx = Math.abs(hb.x - ub.x);
+        const dy = Math.abs(hb.y - ub.y);
+        const overlapX = (hb.w / 2 + ub.w / 2) - dx;
+        const overlapY = (hb.h / 2 + ub.h / 2) - dy;
+
+        if (overlapX > 0 && overlapY > 0) {
+          // Actual overlap center
+          const ix = (hb.x + ub.x) / 2;
+          const iy = (hb.y + ub.y) / 2;
+          return { x: ix, y: iy };
+        }
+      }
+    }
+    return null;
   }
 
   updateLogic() {
@@ -587,15 +625,21 @@ class Character {
   handleCancels() {
     if (!this.currentAnim) return;
 
+    if (globalHitPause > 0) return;
+
     const runtimeFrame = this.getRuntimeFrame();
     const keyframe = this.frameIndex;
+
 
     for (const entry of this.CANCEL_TABLE) {
       // Check state
       if (entry.fromState && !entry.fromState.includes(this.state)) continue;
 
       // Check attack result
-      if (entry.result && entry.result !== this.currentAttackResult) continue;
+      if (entry.result) {
+            const results = Array.isArray(entry.result) ? entry.result : [entry.result];
+            if (!results.includes(this.currentAttackResult)) continue;
+      }
 
       // Check frame ranges
       if (entry.minFrame !== undefined && runtimeFrame < entry.minFrame) continue;
