@@ -93,7 +93,7 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
             let runDir = d.x;
             const forward = this.facing;
             const relativeRun = runDir * forward;
-            const runSpeed = 4;
+            const runSpeed = 3.5;
 
             if (relativeRun > 0) {
                 this.setAnim("run");

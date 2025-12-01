@@ -640,8 +640,9 @@ class Stray extends Character {
       // From base states to 5LK
       { fromState: ["idle", "walk", "run"], buttons: ["lk"], to: "nmlAtk5LK", minFrame: 0 },
 
-      // Example: cancel 5LP → 5RP (only if hit)
+      // 5LP to 5RP (and 5RP back into 5LP)
       { fromState: ["nmlAtk5LP"], result: ["hit","block"], buttons: ["rp"], to: "nmlAtk5RP" },
+      { fromState: ["nmlAtk5RP"], result: ["hit","block"], buttons: ["lp"], to: "nmlAtk5LP" },
     ];
 
     this.changeState("idle");
