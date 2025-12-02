@@ -1,7 +1,7 @@
 # kbb-cross-tekken
 This is a final project for a class in my University.
 
-Forged from the molten pastic of Mishima Zaibatsu, from the lowest floor of the darkest basement where only Electric Wind God Fists dare be made, exists the most unholy item ever to be found in a box of frosted Sugar Doodles... This project. I decided to try and fuse [Kirby Battle Blitz](https://gamejolt.com/games/KBB/578480) and [Tekken 8](https://store.steampowered.com/app/1778820/TEKKEN_8/). No 3D movement however, just a lot of mechanics.
+Forged from the molten plastic of Mishima Zaibatsu, from the lowest floor of the darkest basement where only Electric Wind God Fists dare be made, exists the most unholy item ever to be found in a box of frosted Sugar Doodles... This project. I decided to try and fuse [Kirby Battle Blitz](https://gamejolt.com/games/KBB/578480) and [Tekken 8](https://store.steampowered.com/app/1778820/TEKKEN_8/). No 3D movement however, just a lot of mechanics.
 
 Due to usage of assets that won't become public property until the latest version of KBB (one of the games this is based on; and a fangame I work on as a lead developer), version 3.0.0, releases, after this is graded, this repository may likely become private until said version of the game is publicly released. 
 
