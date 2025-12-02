@@ -514,12 +514,24 @@ class Character {
       globalModifier: {rotation: fxAngle}
     });
 
-    //  Change State 
+    const hitPropAir = md.hit_property_air || "Normal";
+    this.hitPropertyAir = hitPropAir;
+
+    let nextState = "hitstun";
+
     if (this.isAirborne) {
-      this.changeState("airHitstun");
-    } else {
-      this.changeState("hitstun");
+        if (hitPropAir === "Screw") {
+            nextState = "airHitstunScrew";
+        } else if (hitPropAir === "Tornado") {
+            nextState = "airHitstunTornado";
+            // note to future me: isTornadoed should ONLY be reset when opponent recovers
+            this.isTornadoed = true;
+        } else {
+            nextState = "airHitstun";
+        }
     }
+
+    this.changeState(nextState);
   }
 
   takeBlock(attacker, { movedata }) {

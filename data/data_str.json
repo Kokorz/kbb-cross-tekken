@@ -301,6 +301,120 @@
         {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
       ]
     },
+    "hurtAirSpecialStun": {
+      "loop": true,
+      "frames": [
+        { "image": "chr_str/str_hurt_airS_hitstun_000.png", "duration": 2, "modifier": { "offset": [-32,6] } }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "hurtAirScrew0deg": {
+      "loop": true,
+      "frames": [
+        { "image": "chr_str/str_hurt_airS_screw_0deg_000.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_0deg_001.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_0deg_002.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_0deg_003.png", "duration": 2, "modifier": { "offset": [0,14] } }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "hurtAirScrew45deg": {
+      "loop": true,
+      "frames": [
+        { "image": "chr_str/str_hurt_airS_screw_45deg_000.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_45deg_001.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_45deg_002.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_45deg_003.png", "duration": 2, "modifier": { "offset": [0,14] } }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "hurtAirScrew90deg": {
+      "loop": true,
+      "frames": [
+        { "image": "chr_str/str_hurt_airS_screw_90deg_000.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_90deg_001.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_90deg_002.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_90deg_003.png", "duration": 2, "modifier": { "offset": [0,14] } }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "hurtAirScrew135deg": {
+      "loop": true,
+      "frames": [
+        { "image": "chr_str/str_hurt_airS_screw_135deg_000.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_135deg_001.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_135deg_002.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_135deg_003.png", "duration": 2, "modifier": { "offset": [0,14] } }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "hurtAirScrew180deg": {
+      "loop": true,
+      "frames": [
+        { "image": "chr_str/str_hurt_airS_screw_180deg_000.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_180deg_001.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_180deg_002.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_180deg_003.png", "duration": 2, "modifier": { "offset": [0,14] } }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "hurtAirScrew225deg": {
+      "loop": true,
+      "frames": [
+        { "image": "chr_str/str_hurt_airS_screw_225deg_000.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_225deg_001.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_225deg_002.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_225deg_003.png", "duration": 2, "modifier": { "offset": [0,14] } }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "hurtAirScrew270deg": {
+      "loop": true,
+      "frames": [
+        { "image": "chr_str/str_hurt_airS_screw_270deg_000.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_270deg_001.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_270deg_002.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_270deg_003.png", "duration": 2, "modifier": { "offset": [0,14] } }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "hurtAirScrew315deg": {
+      "loop": true,
+      "frames": [
+        { "image": "chr_str/str_hurt_airS_screw_315deg_000.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_315deg_001.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_315deg_002.png", "duration": 2, "modifier": { "offset": [0,14] } },
+        { "image": "chr_str/str_hurt_airS_screw_315deg_003.png", "duration": 2, "modifier": { "offset": [0,14] } }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
     "knockdownFaceUp": {
       "loop": true,
       "frames": [

@@ -477,6 +477,95 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
             }
             return;
 
+        case "airHitstunScrew":
+            if (this.justEnteredState) {
+                // During hitpause, always show this
+                this.setAnim("hurtAirSpecialStun");
+                this.frameIndex = 0;
+                this.frameTimer = 0;
+                this.justEnteredState = false;
+
+                // We will start checking angle after hitpause ends
+                this.prevVelY = this.sprite.vel.y;
+
+            }
+
+            if (globalHitPause > 0) {
+                return;
+            }
+
+            // Apply one-time knockback
+            if (!this.knockbackApplied) {
+                this.sprite.vel.x += this.knockback.x * (this.facing === 1 ? 1 : -1);
+                this.sprite.vel.y += this.knockback.y;
+                this.knockbackApplied = true;
+            }
+
+            // Velocity vector
+            const vx = this.sprite.vel.x * this.facing; // adjust for facing
+            const vy = -this.sprite.vel.y; // invert if +y is down
+
+            // Prevent atan2(0,0)
+            let deg;
+            if (vx === 0 && vy === 0) {
+                deg = this.lastScrewAngle ?? 0;
+            } else {
+                deg = Math.atan2(vy, vx) * (180 / Math.PI);
+                if (deg < 0) deg += 360;
+            }
+
+            // Snap to nearest 45
+            let snapped = Math.round(deg / 45) * 45;
+            snapped = snapped % 360;
+            if (snapped < 0) snapped += 360;
+
+            this.lastScrewAngle = snapped;
+
+            const screwAnim = `hurtAirScrew${snapped}deg`;
+
+            // Switch animation only if different, preserve frame index/timer
+            if (this.currentAnim !== screwAnim) {
+                const oldFrame = this.frameIndex;
+                const oldTimer = this.frameTimer;
+
+                this.setAnim(screwAnim);
+
+                this.frameIndex = oldFrame;
+                this.frameTimer = oldTimer;
+            }
+
+
+            // Physics
+            this.sprite.x += this.sprite.vel.x;
+            this.sprite.y += this.sprite.vel.y;
+
+            // Gravity
+            this.sprite.vel.y += 0.07;
+
+            // Track previous Y velocity
+            this.prevVelY = this.sprite.vel.y;
+
+            // Hitstun decrement
+            if (this.hitStunTimer > 0) {
+                this.hitStunTimer--;
+            }
+
+            // Advance current animation
+            this.advanceFrame();
+
+            // Landing detection
+            if (this.sprite.y >= gfloor.y) {
+                this.sprite.y = gfloor.y;
+                this.sprite.vel.x = 0;
+                this.sprite.vel.y = 0;
+
+                this.airLandingFace = "up";
+                // Always knockdown on screw landing
+                this.changeState("knockdown");
+            }
+
+            return;
+
         case "groundbounce":
             if (this.justEnteredState) {
 
