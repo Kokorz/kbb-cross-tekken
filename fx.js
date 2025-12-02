@@ -107,7 +107,7 @@ class VFX {
 
 class SFX {
     constructor({ soundObj, volume = 1, pitch = 1 }) {
-        this.sound = soundObj.sound; // preloaded p5.SoundFile
+        this.sound = soundObj.sound; // i am a p5.SoundFile. (https://www.youtube.com/watch?v=WIcK_QqD_v8)
         this.volume = volume ?? soundObj.volume ?? 1;
         this.pitch = pitch ?? soundObj.pitch ?? 1;
         this.finished = false;
@@ -122,7 +122,7 @@ class SFX {
             this.sound.play();
             this.finished = true; // considered done immediately
         } else {
-            console.warn("moron tried to play a sound before it was loaded lmao");
+            console.log("moron tried to play a sound before it was loaded lmao");
         }
     }
 

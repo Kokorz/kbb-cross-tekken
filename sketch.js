@@ -87,7 +87,12 @@ const KEYBINDINGS_P2 = {
 };
 
 function preload() {
+  //seriously, whoever on the q5js (not to be confused with p5js) team
+  //came up with this lovely function
+  //i will split you into atoms.
   defaultImageScale(1);
+
+
   soundFormats('wav', 'ogg');
   data_str = loadJSON("data/data_str.json");
   data_gli = loadJSON("data/data_gli.json");
@@ -98,8 +103,12 @@ function setup() {
 
   str_loadedAnimations = loadAnimations(data_str);
   gli_loadedAnimations = loadAnimations(data_gli);
-  loadFXJSON(data_fx);
+  loadFX(data_fx);
 
+  //browsers don't have autoplay for audio... 
+  //eventually i'll make a title screen thing
+  //and when you press the start button is when
+  //this game can initialize an "AudioContext"
   userStartAudio();
 
   new Canvas(256, 144);
@@ -128,13 +137,17 @@ function setup() {
 function loadAnimations(json) {
   let anims = {};
 
+  //JSONs don't support comments, so I'll explain a bit here.
+  //All animation data, hitboxes, movedata, hitboxes, etc, etc
+  //is defined in a json. This function serializes all the data
+  //in the json into stuff the game can actually work with!
+
   for (const [name, data] of Object.entries(json.animations)) {
     let lastMoveData = data.defaultMoveData ?? null;
 
     const frames = data.frames.map((f) => {
       if (f.movedata) lastMoveData = f.movedata;
 
-      // Preserve the modifier object
       const modifier = f.modifier ?? {};
 
       return {
@@ -166,7 +179,7 @@ function loadAnimations(json) {
   return anims;
 }
 
-function loadFXJSON(json) {
+function loadFX(json) {
   // Visual FX
   for (const [key, data] of Object.entries(json.visual)) {
     const frames = data.frames.map(f => {
@@ -516,11 +529,11 @@ function checkHits(attacker, defender) {
       // Tekken High Whiff Rule: standing High attack whiffs on crouch if defender not guarding
       if (
         guardFlag === "High" &&
-        defender.isCrouching &&
+        defender.states[defender.state].type === "crouch" &&
         !defender.isHoldingBack() &&
         !defender.isHoldingDownBack()
       ) {
-        continue; // still whiffed
+        return; // still whiffed
       }
 
       // Determine if defender is attempting to block
@@ -726,7 +739,7 @@ class Glitch extends Character {
       // From base states to 5LK
       { fromState: ["idle", "walk", "run"], buttons: ["lk"], to: "nmlAtk5LK", minFrame: 0 },
 
-      // Example: cancel 5LP → 5RP (only if hit)
+      // Example: cancel 5LP -> 5RP (only if hit)
       { fromState: ["nmlAtk5LP"], result: "hit", buttons: ["rp"], to: "nmlAtk5RP" },
     ];
 

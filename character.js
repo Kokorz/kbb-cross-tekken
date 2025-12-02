@@ -237,10 +237,10 @@ class Character {
   handleInput() {
     const now = frameCount;
 
-    // - Compute current direction from table-driven system -
+    // fetch current direction from table -
     const dir = this.getCurrentDirection(); // uses DIR_FROM_AXES
 
-    // - Poll buttons for this frame -
+    // Poll buttons for this frame
     const curBtn = {
       lp: keyIsDown(this.keybindings.lp),
       rp: keyIsDown(this.keybindings.rp),
@@ -248,7 +248,7 @@ class Character {
       rk: keyIsDown(this.keybindings.rk),
     };
 
-    //  Direction edge detection (push only when direction changes)
+    // Direction edge detection (push only when direction changes)
 
     if (dir !== 5 && dir !== this.prevInputs.dir) {
       // Only push if non-neutral AND changed since last frame
@@ -298,8 +298,8 @@ class Character {
     const dir = this.getCurrentDirection();
     const d = DIR[dir];
 
-    // Facing 1 → back = x = -1
-    // Facing -1 → back = x = +1
+    // Facing 1 -> back = x = -1
+    // Facing -1 -> back = x = +1
     const backX = (this.facing === 1 ? -1 : 1);
 
     // "Standing" or "jumping" back (not crouching)
@@ -350,7 +350,7 @@ class Character {
         this.frameIndex = anim.loopStart || 0;
     }
 
-    // Movedata change detection (deep compare)
+    // Movedata change detection (this is a deep compare, so json.stringify is necessary)
     const currentMD = this.getCurrentMoveData();
     const prev = this.lastMoveData;
     const changed = JSON.stringify(currentMD) !== JSON.stringify(prev);
@@ -369,13 +369,13 @@ class Character {
     const frames = anim.frames;
     const fi = this.frameIndex;
 
-    // 1. Check current frame movedata
+    // Check current frame movedata
     const frameMD = frames[fi]?.movedata;
     if (frameMD && frameMD.length > 0) {
       return frameMD[0]; // always expect one movedata object
     }
 
-    // 2. Search backwards for last defined movedata
+    // Search backwards for last defined movedata
     for (let i = fi - 1; i >= 0; i--) {
       const md = frames[i].movedata;
       if (md && md.length > 0) {
@@ -383,13 +383,13 @@ class Character {
       }
     }
 
-    // 3. Fall back to defaultMoveData
+    // Fall back to defaultMoveData
     const defaultMD = anim.defaultMoveData;
     if (defaultMD && defaultMD.length > 0) {
       return defaultMD[0];
     }
 
-    // 4. Nothing found
+    // Nothing found? :(
     return null;
   }
 
@@ -479,6 +479,8 @@ class Character {
     attacker.canHitThisSequence = false;
     attacker.lastHitMoveData = md;
 
+    this.incomingHitAnimType = md.hit_animtype_ground;
+
     this.isAirborne = (this.sprite.y > gfloor.y) || this.stateType === "air" || md.launch === true;
 
     this.frameIndex = 0;
@@ -500,7 +502,7 @@ class Character {
         fxAngle = degrees(atan2(-this.knockback.y, this.knockback.x));
     }
 
-    //  FX SPAWN based on strength 
+    // this is based on strength 
     spawnFX({
       x: fxX,
       y: fxY,

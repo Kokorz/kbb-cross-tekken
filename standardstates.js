@@ -472,7 +472,7 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
                 if (this.knockback.y > -2) {
                     this.changeState("knockdown");
                 } else {
-                    this.changeState("groundbounce"); // optional
+                    this.changeState("groundbounce");
                 }
             }
             return;
