@@ -220,6 +220,9 @@ Due to usage of assets that won't become public property until the latest versio
 - [ ] Makey Makey support
 - [ ] Damage Scaling
 - [ ] Launch Scaling (aka, Tekken's Juggle System)
+- [ ] Make a wall.
+- [ ] Add a proper background
+- [ ] Make UI more Stylish
 - [ ] Effects System
   - [x] Sound and Visual Effects Spawn/Play
   - [ ] Visual Effects can be manipulated in character class and its subclasses
