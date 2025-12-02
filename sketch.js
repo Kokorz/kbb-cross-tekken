@@ -661,7 +661,9 @@ class Stray extends Character {
       { fromState: ["idle", "walk", "run"], buttons: ["lk"], to: "nmlAtk5LK", minFrame: 0 },
 
       // 5LP to 5RP (and 5RP back into 5LP)
+      //also 5RP to 66LP
       { fromState: ["nmlAtk5LP"], result: ["hit", "block"], buttons: ["rp"], to: "nmlAtk5RP" },
+      { fromState: ["nmlAtk5RP"], result: ["hit", "block"], motion: ["run"], buttons: ["lp"], to: "nmlAtk66LP" },
       { fromState: ["nmlAtk5RP"], result: ["hit", "block"], buttons: ["lp"], to: "nmlAtk5LP" },
     ];
 
@@ -710,7 +712,7 @@ class Stray extends Character {
       this.setAnim("nmlAtk66LP");
       this.frameIndex = 0;
       this.frameTimer = 0;
-      this.sprite.vel.x = 1.5;
+      this.sprite.vel.x = 1.5*this.facing;
       this.DashLP_Boosted = false;
       this.justEnteredState = false;
     }
@@ -719,8 +721,8 @@ class Stray extends Character {
     this.sprite.x += this.sprite.vel.x;
     this.sprite.vel.x *= 0.8;
 
-    if (this.frameIndex = 4 && !this.DashLP_Boosted) {
-      this.sprite.vel.x += 2.5;
+    if (this.frameIndex === 3 && !this.DashLP_Boosted) {
+      this.sprite.vel.x -= 2.5*-this.facing;
       this.DashLP_Boosted = true;
     }
 
@@ -730,7 +732,10 @@ class Stray extends Character {
 
     this.advanceFrame("nmlAtk66LP");
     const anim = this.anims.nmlAtk66LP;
-    if (this.frameIndex >= anim.frames.length - 1) this.changeState("idle");
+    if (this.frameIndex >= anim.frames.length - 1) {
+      this.sprite.vel.x = 0;
+      this.changeState("idle");
+    }
   }
 
   state_nmlAtk5LK() {

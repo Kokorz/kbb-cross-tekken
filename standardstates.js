@@ -437,8 +437,6 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
             // Horizontal drag
             this.sprite.vel.x *= 0.95;
 
-            console.log(this.sprite.vel.y);
-
             // Switch to air fall animation only once moving downward
             if (this.prevVelY < 0 && this.sprite.vel.y >= 0 && this.currentAnim !== "hurtAirFall") {
                 this.setAnim("hurtAirFall");

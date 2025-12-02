@@ -296,7 +296,7 @@
     "hurtAirSpecialStun": {
       "loop": true,
       "frames": [
-        { "image": "chr_gli/gli_hurt_airS_hitstun_000.png", "duration": 2, "modifier": { "offset": [6,16] } }
+        { "image": "chr_gli/gli_hurt_airS_hitstun_000.png", "duration": 2, "modifier": { "offset": [-6,16] } }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
