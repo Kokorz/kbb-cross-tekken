@@ -89,7 +89,8 @@ const KEYBINDINGS_P2 = {
 function preload() {
   //seriously, whoever on the q5js (not to be confused with p5js) team
   //came up with this lovely function
-  //i will split you into atoms.
+  //i will split you into atoms...
+  //you cost me an entire day of work :(
   defaultImageScale(1);
 
 
