@@ -24,12 +24,12 @@ Due to usage of assets that won't become public property until the latest versio
   - [x] Air Normal
   - [ ] Tornado
     - (sprites are made!)
-  - [ ] Screw
-    - (sprites are made!)
+  - [x] Screw
   - [x] Groundbounce
-    - NOTE: OTG'ing doesn't work properly yet
   - [x] Knockdown
+    - NOTE: OTG'ing doesn't work properly yet
     - NOTE: Teching has not been implemented
+    - NOTE: Could use a bit of sliding to a stop (easing) when they hit the ground IF there's an xvel
   - [ ] Wall Splat
     - (sprites are made!)
 ### Attacks
@@ -86,7 +86,7 @@ Due to usage of assets that won't become public property until the latest versio
     - Shoulder Tackle. [Tetsuzanko!](https://virtuafighter.com/commands/tetsuzank%C5%8D.23329/view)
   - [ ] Animation
   - [ ] Code
-- [ ] 66RP
+- [ ] 66LP
   - [x] Concept
       - A dashing uppercut! 
   - [ ] Animation
@@ -220,7 +220,7 @@ Due to usage of assets that won't become public property until the latest versio
 - [ ] Makey Makey support
 - [ ] Damage Scaling
 - [ ] Launch Scaling (aka, Tekken's Juggle System)
-- [ ] Make a wall.
+- [ ] Add in the WALLS.
 - [ ] Add a proper background
 - [ ] Make UI more Stylish
 - [ ] Effects System

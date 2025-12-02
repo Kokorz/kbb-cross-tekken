@@ -463,7 +463,7 @@
       "playOnce": true,
       "frames": [
         { "image": "chr_gli/gli_nmlAtk5LP_000.png", "duration": 6, "modifier": { "offset": [2,0] } },
-        { "image": "chr_gli/gli_nmlAtk5LP_001.png", "duration": 2, "modifier": { "offset": [2,0] }, "boxes": [{"type": "hitbox", "x": 10, "y": -15, "w": 20, "h": 10}], "movedata": [{"damage": 200, "hit_pause": 5, "hit_stun": 24, "hit_knockback": [-1,-1], "launch": true, "block_pause": 3, "block_stun" : 12, "block_knockback": [-1,0], "hit_animtype_ground": "High", "hit_property_air": "Screw", "guard_flag": "Mid", "strength": "Heavy"}]  },
+        { "image": "chr_gli/gli_nmlAtk5LP_001.png", "duration": 2, "modifier": { "offset": [2,0] }, "boxes": [{"type": "hitbox", "x": 10, "y": -15, "w": 20, "h": 10}], "movedata": [{"damage": 200, "hit_pause": 5, "hit_stun": 24, "hit_knockback": [-2.4,-2], "launch": true, "block_pause": 3, "block_stun" : 12, "block_knockback": [-1,0], "hit_animtype_ground": "High", "hit_property_air": "Normal", "guard_flag": "Mid", "strength": "Heavy"}]  },
         { "image": "chr_gli/gli_nmlAtk5LP_002.png", "duration": 12, "modifier": { "offset": [2,0] } },
         { "image": "chr_gli/gli_nmlAtk5LP_002.png", "duration": 4, "modifier": { "offset": [2,0] } }
       ],

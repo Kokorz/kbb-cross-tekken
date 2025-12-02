@@ -471,7 +471,7 @@
       "playOnce": true,
       "frames": [
         { "image": "chr_str/str_nmlAtk5LP_000.png", "duration": 6, "modifier": { "offset": [8,0] } },
-        { "image": "chr_str/str_nmlAtk5LP_001.png", "duration": 2, "modifier": { "offset": [8,0] }, "boxes": [{"type": "hitbox", "x": 10, "y": -15, "w": 20, "h": 10}], "movedata": [{"damage": 200, "hit_pause": 5, "hit_stun": 24, "hit_knockback": [-1,0], "block_pause": 3, "block_stun" : 12, "block_knockback": [-1,0], "hit_animtype_ground": "High", "guard_flag": "Mid", "strength": "Medium"}]  },
+        { "image": "chr_str/str_nmlAtk5LP_001.png", "duration": 2, "modifier": { "offset": [8,0] }, "boxes": [{"type": "hitbox", "x": 10, "y": -15, "w": 20, "h": 10}], "movedata": [{"damage": 200, "hit_pause": 5, "hit_stun": 24, "hit_knockback": [-1,0], "block_pause": 3, "block_stun" : 12, "block_knockback": [-1,0], "hit_animtype_ground": "High", "guard_flag": "Mid", "strength": "Light"}]  },
         { "image": "chr_str/str_nmlAtk5LP_002.png", "duration": 8, "modifier": { "offset": [8,0] } },
         { "image": "chr_str/str_nmlAtk5LP_003.png", "duration": 4, "modifier": { "offset": [8,0] } },
         { "image": "chr_str/str_nmlAtk5LP_003.png", "duration": 8, "modifier": { "offset": [8,0] } }
@@ -485,10 +485,27 @@
       "playOnce": true,
       "frames": [
         { "image": "chr_str/str_nmlAtk5RP_000.png", "duration": 6, "modifier": { "offset": [8,0] } },
-        { "image": "chr_str/str_nmlAtk5RP_001.png", "duration": 2, "modifier": { "offset": [8,0] }, "boxes": [{"type": "hitbox", "x": 10, "y": -15, "w": 20, "h": 10}], "movedata": [{"damage": 200, "hit_pause": 5, "hit_stun": 24, "hit_knockback": [-1,0], "block_pause": 3, "block_stun" : 12, "block_knockback": [-3,0], "hit_animtype_ground": "Low", "guard_flag": "Mid", "strength": "Light"}]  },
+        { "image": "chr_str/str_nmlAtk5RP_001.png", "duration": 2, "modifier": { "offset": [8,0] }, "boxes": [{"type": "hitbox", "x": 10, "y": -15, "w": 20, "h": 10}], "movedata": [{"damage": 200, "hit_pause": 5, "hit_stun": 24, "hit_knockback": [-1,0], "block_pause": 3, "block_stun" : 12, "block_knockback": [-3,0], "hit_animtype_ground": "Low", "guard_flag": "Mid", "strength": "Medium"}]  },
         { "image": "chr_str/str_nmlAtk5RP_002.png", "duration": 8, "modifier": { "offset": [8,0] } },
         { "image": "chr_str/str_nmlAtk5RP_003.png", "duration": 4, "modifier": { "offset": [8,0] } },
         { "image": "chr_str/str_nmlAtk5RP_003.png", "duration": 60, "modifier": { "offset": [8,0] } }
+      ],
+      "defaultBoxes": [
+        {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},
+        {"type": "hurtbox", "x": -10, "y": 0, "w": 20, "h": -20}
+      ]
+    },
+    "nmlAtk66LP": {
+      "playOnce": true,
+      "frames": [
+        { "image": "chr_str/str_nmlAtk66LP_000.png", "duration": 2, "modifier": { "offset": [0,0] } },
+        { "image": "chr_str/str_nmlAtk66LP_001.png", "duration": 2, "modifier": { "offset": [0,0] } },
+        { "image": "chr_str/str_nmlAtk66LP_002.png", "duration": 3, "modifier": { "offset": [0,0] } },
+        { "image": "chr_str/str_nmlAtk66LP_003.png", "duration": 2, "modifier": { "offset": [0,0] } },
+        { "image": "chr_str/str_nmlAtk66LP_004.png", "duration": 2, "modifier": { "offset": [0,0] }, "boxes": [{"type": "hitbox", "x": 10, "y": -15, "w": 20, "h": 10}], "movedata": [{"damage": 200, "hit_pause": 7, "hit_stun": 24, "hit_knockback": [-1,-1], "launch": true, "block_pause": 3, "block_stun" : 12, "block_knockback": [-1,0], "hit_animtype_ground": "High", "hit_property_air": "Screw", "guard_flag": "Mid", "strength": "Heavy"}]  },
+        { "image": "chr_str/str_nmlAtk66LP_005.png", "duration": 5, "modifier": { "offset": [0,0] } },
+        { "image": "chr_str/str_nmlAtk66LP_006.png", "duration": 8, "modifier": { "offset": [0,0] } },
+        { "image": "chr_str/str_nmlAtk66LP_006.png", "duration": 60, "modifier": { "offset": [0,0] } }
       ],
       "defaultBoxes": [
         {"type": "pushbox", "x": -6, "y": 0, "w": 11, "h": -15},

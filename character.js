@@ -330,6 +330,13 @@ class Character {
     return false;
   }
 
+  wasDirectionTapped(dir) {
+    const now = frameCount;
+    // consider buffer window, similar to buttonBuffer (e.g., 20 frames)
+    const window = 20;
+    return this.inputBuffer.some(e => e.dir === dir && now - e.frame <= window);
+  }
+
   getBuffer() { return this.inputBuffer; }
 
   hasMotion(name) {
@@ -499,7 +506,7 @@ class Character {
     //hitspark angle modifier calculation
     let fxAngle = 0;
     if (this.knockback.x !== 0 || this.knockback.y !== 0) {
-        fxAngle = degrees(atan2(-this.knockback.y, this.knockback.x));
+      fxAngle = degrees(atan2(-this.knockback.y, this.knockback.x));
     }
 
     // this is based on strength 
@@ -511,7 +518,7 @@ class Character {
       autoFlipFrom: attacker,
       follow: true,
       followTime: 1,
-      globalModifier: {rotation: fxAngle}
+      globalModifier: { rotation: fxAngle }
     });
 
     const hitPropAir = md.hit_property_air || "Normal";
@@ -520,15 +527,15 @@ class Character {
     let nextState = "hitstun";
 
     if (this.isAirborne) {
-        if (hitPropAir === "Screw") {
-            nextState = "airHitstunScrew";
-        } else if (hitPropAir === "Tornado") {
-            nextState = "airHitstunTornado";
-            // note to future me: isTornadoed should ONLY be reset when opponent recovers
-            this.isTornadoed = true;
-        } else {
-            nextState = "airHitstun";
-        }
+      if (hitPropAir === "Screw") {
+        nextState = "airHitstunScrew";
+      } else if (hitPropAir === "Tornado") {
+        nextState = "airHitstunTornado";
+        // note to future me: isTornadoed should ONLY be reset when opponent recovers
+        this.isTornadoed = true;
+      } else {
+        nextState = "airHitstun";
+      }
     }
 
     this.changeState(nextState);
@@ -646,16 +653,16 @@ class Character {
 
 
     for (const entry of this.CANCEL_TABLE) {
-      // Check state
+      // Check state if required
       if (entry.fromState && !entry.fromState.includes(this.state)) continue;
 
-      // Check attack result
+      // Check attack result if required
       if (entry.result) {
-            const results = Array.isArray(entry.result) ? entry.result : [entry.result];
-            if (!results.includes(this.currentAttackResult)) continue;
+        const results = Array.isArray(entry.result) ? entry.result : [entry.result];
+        if (!results.includes(this.currentAttackResult)) continue;
       }
 
-      // Check frame ranges
+      // Check frame ranges if required
       if (entry.minFrame !== undefined && runtimeFrame < entry.minFrame) continue;
       if (entry.maxFrame !== undefined && runtimeFrame > entry.maxFrame) continue;
 
@@ -665,8 +672,11 @@ class Character {
       // Check button tap if required
       if (entry.buttons && !entry.buttons.every((b) => this.wasButtonTapped(b))) continue;
 
-      // Check motion if required
-      if (entry.motion && !this.hasMotion(entry.motion)) continue;
+      // Check directional inputs if required
+      if (entry.directions && !entry.directions.every(d => this.wasDirectionTapped(d))) continue;
+
+      // Check motion inputs if required
+      if (entry.motion && !entry.motion.every(m => detectMotion(this.inputBuffer, m, this.facing))) continue;
 
       // All conditions met, perform cancel
       this.changeState(entry.to);

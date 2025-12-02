@@ -647,6 +647,12 @@ class Stray extends Character {
     // }
 
     this.CANCEL_TABLE = [
+      // From base states to 66LP
+      { fromState: ["idle", "walk", "run"], motion: ["run"], buttons: ["lp"], to: "nmlAtk66LP", minFrame: 0 },
+      // From run to 66LP
+      { fromState: ["run"], buttons: ["lp"], to: "nmlAtk66LP", minFrame: 0 },
+
+
       // From base states to 5LP
       { fromState: ["idle", "walk", "run"], buttons: ["lp"], to: "nmlAtk5LP", minFrame: 0 },
       // From base states to 5RP
@@ -655,8 +661,8 @@ class Stray extends Character {
       { fromState: ["idle", "walk", "run"], buttons: ["lk"], to: "nmlAtk5LK", minFrame: 0 },
 
       // 5LP to 5RP (and 5RP back into 5LP)
-      { fromState: ["nmlAtk5LP"], result: ["hit","block"], buttons: ["rp"], to: "nmlAtk5RP" },
-      { fromState: ["nmlAtk5RP"], result: ["hit","block"], buttons: ["lp"], to: "nmlAtk5LP" },
+      { fromState: ["nmlAtk5LP"], result: ["hit", "block"], buttons: ["rp"], to: "nmlAtk5RP" },
+      { fromState: ["nmlAtk5RP"], result: ["hit", "block"], buttons: ["lp"], to: "nmlAtk5LP" },
     ];
 
     this.changeState("idle");
@@ -695,6 +701,35 @@ class Stray extends Character {
 
     this.advanceFrame("nmlAtk5RP");
     const anim = this.anims.nmlAtk5LP;
+    if (this.frameIndex >= anim.frames.length - 1) this.changeState("idle");
+  }
+
+
+  state_nmlAtk66LP() {
+    if (this.justEnteredState) {
+      this.setAnim("nmlAtk66LP");
+      this.frameIndex = 0;
+      this.frameTimer = 0;
+      this.sprite.vel.x = 1.5;
+      this.DashLP_Boosted = false;
+      this.justEnteredState = false;
+    }
+
+    //friction
+    this.sprite.x += this.sprite.vel.x;
+    this.sprite.vel.x *= 0.8;
+
+    if (this.frameIndex = 4 && !this.DashLP_Boosted) {
+      this.sprite.vel.x += 2.5;
+      this.DashLP_Boosted = true;
+    }
+
+    if (typeof globalHitPause !== "undefined" && globalHitPause > 0) {
+      return;
+    }
+
+    this.advanceFrame("nmlAtk66LP");
+    const anim = this.anims.nmlAtk66LP;
     if (this.frameIndex >= anim.frames.length - 1) this.changeState("idle");
   }
 
