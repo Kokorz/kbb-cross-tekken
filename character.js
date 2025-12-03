@@ -57,6 +57,8 @@ class Character {
     this.lastMoveData = null;
     this.lastHitMoveData = null;
 
+    this._hasHitCurrentMoveData = false;
+
     this.blockStunTimer = 0;
 
     this.inputBuffer = [];
@@ -70,8 +72,14 @@ class Character {
     };
 
     this.ground = gfloor;
+    this.walls = [wall1, wall2];
 
     this.currentAttackResult = null; // null | "hit" | "block" | "whiff"
+
+    this.comboHitCount = 0;
+    this.airJuggleHitCountDmg = 0;
+    this.airJuggleHitCountKB = 0;
+    this.knockbackScaling = 1;
 
     this.states = {
       idle: { type: "stand" },
@@ -88,11 +96,15 @@ class Character {
       guardLo: { type: "crouch" },
       guardPostHi: { type: "stand" },
       guardPostLo: { type: "crouch" },
-      hitstun: { type: "stand" },       // grounded hitstun
-      airHitstun: { type: "air" },      // air hitstun
+      hitstun: { type: "stand" },
+      airHitstun: { type: "air" },
+      airHitstunScrew: { type: "air" },
       groundbounce: { type: "air" },
       knockdown: { type: "liedown" }
     };
+
+    this.damageScaleTable = [1, 0.7, 0.5, 0.4, 0.3];
+    this.wallDamageScaleModifier = 0.8;
 
     this.CANCEL_TABLE = [];
 
@@ -357,15 +369,14 @@ class Character {
         this.frameIndex = anim.loopStart || 0;
     }
 
-    // Movedata change detection (this is a deep compare, so json.stringify is necessary)
+    // Movedata change detection
     const currentMD = this.getCurrentMoveData();
     const prev = this.lastMoveData;
-    const changed = JSON.stringify(currentMD) !== JSON.stringify(prev);
-
-    if (changed) {
+    const movedataChanged = currentMD !== prev;
+    if (movedataChanged) {
       this.canHitThisSequence = true;
+      this._hasHitCurrentMoveData = false;
     }
-
     this.lastMoveData = currentMD;
   }
 
@@ -468,27 +479,51 @@ class Character {
     const md = attacker.getCurrentMoveData();
     if (!md) return;
 
+    globalHitPause = md.hit_pause || 0;
+
     attacker.currentAttackResult = "hit";
+    let dmgFactor;
+
+    this.isAirborne = (this.sprite.y > gfloor.y) || this.stateType === "air" || md.launch === true;
+
+    this.comboHitCount++;
+    if (this.isAirborne) {
+      this.airJuggleHitCountDmg += 1;
+      this.airJuggleHitCountKB += 1;
+    } else {
+      this.airJuggleHitCountDmg = 0;
+      this.airJuggleHitCountKB = 0;
+    }
+
+    dmgFactor =
+      this.airJuggleHitCountDmg > 4
+        ? this.damageScaleTable[4]
+        : this.damageScaleTable[this.airJuggleHitCountDmg];
+
+
+    if (this.airJuggleHitCountKB > 0) {
+      this.knockbackScaling += this.airJuggleHitCountKB * 0.1;
+    }
+
+    console.log(this.knockbackScaling, this.airJuggleHitCountKB)
 
     //  Damage & Hit Logic 
-    this.health -= md.damage || 0;
+    this.health -= md.damage * dmgFactor || 0;
     if (this.health < 0) this.health = 0;
 
-    globalHitPause = md.hit_pause || 0;
     this.hitStunTimer = md.hit_stun || 0;
 
     this.knockback = {
-      x: md.hit_knockback?.[0] || 0,
+      x: md.hit_knockback?.[0] * this.knockbackScaling || 0,
       y: md.hit_knockback?.[1] || 0,
     };
     this.knockbackApplied = false;
 
     attacker.canHitThisSequence = false;
+    attacker._hasHitCurrentMoveData = true;
     attacker.lastHitMoveData = md;
 
     this.incomingHitAnimType = md.hit_animtype_ground;
-
-    this.isAirborne = (this.sprite.y > gfloor.y) || this.stateType === "air" || md.launch === true;
 
     this.frameIndex = 0;
     this.frameTimer = 0;
@@ -585,16 +620,20 @@ class Character {
 
   fetchHitIntersection(attackerBoxes, defenderBoxes) {
     for (const hb of attackerBoxes) {
+      if (hb.w === 0 || hb.h === 0) continue;
+      const hcx = hb.x + hb.w / 2;
+      const hcy = hb.y + hb.h / 2;
       for (const ub of defenderBoxes) {
-        const dx = Math.abs(hb.x - ub.x);
-        const dy = Math.abs(hb.y - ub.y);
-        const overlapX = (hb.w / 2 + ub.w / 2) - dx;
-        const overlapY = (hb.h / 2 + ub.h / 2) - dy;
+        if (ub.w === 0 || ub.h === 0) continue;
+        const ucx = ub.x + ub.w / 2;
+        const ucy = ub.y + ub.h / 2;
+
+        const overlapX = (hb.w / 2 + ub.w / 2) - Math.abs(hcx - ucx);
+        const overlapY = (hb.h / 2 + ub.h / 2) - Math.abs(hcy - ucy);
 
         if (overlapX > 0 && overlapY > 0) {
-          // Actual overlap center
-          const ix = (hb.x + ub.x) / 2;
-          const iy = (hb.y + ub.y) / 2;
+          const ix = (hcx + ucx) / 2;
+          const iy = (hcy + ucy) / 2;
           return { x: ix, y: iy };
         }
       }
@@ -605,7 +644,9 @@ class Character {
   updateLogic() {
     this.handleInput();
     this.updateFacing();
+
     this.updateBoxes();
+    this.clampPosToWalls();
 
     if (this._pendingGuardState) {
       this.changeState(this._pendingGuardState);
@@ -614,11 +655,19 @@ class Character {
       this._pendingGuardState = null;
       this._pendingBlockStunTimer = 0;
       this._pendingKnockback = { x: 0, y: 0 };
+
+      //just in case it changed
+      this.updateBoxes();
+      this.clampPosToWalls();
     }
 
     this.handleCancels();
     this.handleStandardStates();
     if (this[`state_${this.state}`]) this[`state_${this.state}`]();
+
+    //just in case it changed... again
+    this.updateBoxes();
+    this.clampPosToWalls();
 
     const anim = this.anims[this.currentAnim || this.state];
     if (anim) {
@@ -636,6 +685,67 @@ class Character {
 
     this.sprite.x = floor(this.sprite.x);
     this.sprite.y = floor(this.sprite.y);
+
+    for (const wall of this.walls) {
+      const px = this.sprite.x;
+      const pw = this
+    }
+  }
+
+  fetchWallBounds() {
+    if (!this.walls || this.walls.length === 0) {
+      return { left: -Infinity, right: Infinity }
+    }
+
+    let left = Infinity;
+    let right = -Infinity;
+
+    for (const w of this.walls) {
+      if (w.x < left) left = w.x;
+      if (w.x > right) right = w.x;
+    }
+
+    return { left, right }
+  }
+
+  fetchHurtboxBounds() {
+    let minX = Infinity;
+    let maxX = -Infinity;
+
+    for (const b of this.hurtboxes) {
+      if (b.w === 0 || b.h === 0) continue;
+      let left = b.x;
+      let right = b.x + b.w;
+
+      if (left < minX) minX = left;
+      if (right > maxX) maxX = right;
+    }
+
+    if (minX === Infinity) {
+      minX = this.sprite.x;
+      maxX = this.sprite.x;
+    }
+
+    return { minX, maxX }
+  }
+
+  clampPosToWalls() {
+
+    const { left, right } = this.fetchWallBounds();
+    const { minX, maxX } = this.fetchHurtboxBounds();
+
+    if (minX < left) {
+      const correction = left - minX;
+      this.sprite.x += correction;
+      this.updateBoxes();
+    }
+
+    if (maxX > right) {
+      const correction = right - maxX;
+      this.sprite.x += correction
+      this.updateBoxes();
+    }
+
   }
 
   //open standardstates.js for this class's definition!

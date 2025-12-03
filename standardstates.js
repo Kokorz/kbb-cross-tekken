@@ -399,8 +399,10 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
             const dirAfter = this.getCurrentDirection();
             this.sprite.vel.x = 0;
             if (dirAfter === 2 || dirAfter === 1 || dirAfter === 3) {
+                this.comboHitCount = 0;
                 this.changeState("crouch");
             } else {
+                this.comboHitCount = 0;
                 this.changeState("idle");
             }
             return;
@@ -559,6 +561,8 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
 
                 this.airLandingFace = "up";
                 // Always knockdown on screw landing
+                this.airJuggleHitCountKB = 0;
+                this.knockbackScaling = 0;
                 this.changeState("knockdown");
             }
 
@@ -583,6 +587,9 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
                 // During prephase: no hop yet
                 this.sprite.vel.x *= 0.4;
                 this.sprite.vel.y = 0;
+
+                this.airJuggleHitCountKB = 0;
+                this.knockbackScaling = 1;
 
                 this.justEnteredState = false;
             }
@@ -680,6 +687,9 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
                 this.sprite.vel.x *= 0.4;  // reduced slide
                 this.sprite.vel.y = 0;
 
+                this.airJuggleHitCountKB = 0;
+                this.knockbackScaling = 1;
+
                 this.justEnteredState = false;
             }
 
@@ -703,8 +713,10 @@ Character.prototype.handleStandardStates = function handleStandardStates() {
 
             // Timer expired → allow tech/wakeup later
             if (this.knockdownTimer <= 0) {
-                this.changeState("idle");
+                this.comboHitCount = 0;
+                this.airJuggleHitCount = 0;
                 this.knockdownTimer = 0;
+                this.changeState("idle");
             }
 
             return;

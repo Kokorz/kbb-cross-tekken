@@ -6,7 +6,7 @@ let gli_loadedAnimations = {};
 let data_fx;
 let visualEffects = {};
 let soundEffects = {};
-let p1, p2, gfloor;
+let p1, p2, gfloor, wall1, wall2;
 
 let bgOffsetX = 0,
   bgOffsetY = 0;
@@ -120,11 +120,34 @@ function setup() {
 
   allSprites.pixelPerfect = true;
 
+  const W = width;
+  const H = height;
+  const OFFSET = W * 1.5; // wall thickness = width * 2
+
   gfloor = new Sprite();
   gfloor.y = width * 0.972;
   gfloor.w = width * 4;
   gfloor.h = 0;
   gfloor.physics = STATIC;
+  gfloor.layer = -9;
+
+  // LEFT WALL
+  wall1 = new Sprite();
+  wall1.x = -OFFSET;
+  wall1.y = H / 2;
+  wall1.w = 1;
+  wall1.h = H * 3;
+  wall1.physics = STATIC;
+  wall1.layer = -10;
+
+  // RIGHT WALL
+  wall2 = new Sprite();
+  wall2.x = W + OFFSET;
+  wall2.y = H / 2;
+  wall2.w = 1;
+  wall2.h = H * 3;
+  wall2.physics = STATIC;
+  wall2.layer = -10;
 
   p1 = new Stray((width / 4) * 3, gfloor.y, KEYBINDINGS_P1);
   p2 = new Glitch(width / 4, gfloor.y, KEYBINDINGS_P2);
@@ -134,6 +157,42 @@ function setup() {
 
   UI = new HUD(p1, p2);
 }
+
+function update() {
+  gfloor.x = (p1.sprite.y + p2.sprite.y) / 2;
+  p1.updateLogic();
+  p2.updateLogic();
+  checkHits(p1, p2);
+  checkHits(p2, p1);
+  resolvePush(p1, p2);
+  resolvePush(p2, p1);
+  updateFX();
+
+  if (globalHitPause > 0) {
+    globalHitPause--;
+    return; // literally freeze the entire game world except timers
+  }
+}
+
+function draw() {
+  background(220);
+  drawParallaxBackground();
+  updateCamera();
+
+  camera.on();
+  wall1.draw();
+  wall2.draw();
+  gfloor.draw();
+  drawInfiniteFloor();
+  p1.render();
+  p2.render();
+
+  renderVFX();
+
+  camera.off();
+  UI.display();
+}
+
 
 function loadAnimations(json) {
   let anims = {};
@@ -229,38 +288,6 @@ function loadFX(json) {
   return { visualEffects, soundEffects };
 }
 
-function update() {
-  gfloor.x = (p1.sprite.y + p2.sprite.y) / 2;
-  p1.updateLogic();
-  p2.updateLogic();
-  checkHits(p1, p2);
-  checkHits(p2, p1);
-  resolvePush(p1, p2);
-  resolvePush(p2, p1);
-  updateFX();
-
-  if (globalHitPause > 0) {
-    globalHitPause--;
-    return; // literally freeze the entire game world except timers
-  }
-}
-
-function draw() {
-  background(220);
-  drawParallaxBackground();
-  updateCamera();
-
-  camera.on();
-  drawInfiniteFloor();
-  p1.render();
-  p2.render();
-
-  renderVFX();
-
-  camera.off();
-  UI.display();
-}
-
 function updateCamera() {
   //  Player distance for dynamic zoom 
   const pDist = abs(p1.sprite.x - p2.sprite.x);
@@ -326,7 +353,7 @@ function drawParallaxBackground() {
   noStroke();
   for (let y = 0; y < rows; y++)
     for (let x = 0; x < cols; x++)
-      fill((x + y) % 2 === 0 ? 130 : 170),
+      fill((x + y) % 2 === 0 ? 163 : 212, (x + y) % 2 === 0 ? 190 : 218, (x + y) % 2 === 0 ? 197 : 208),
         rect(
           x * checkerSize - bgOffsetX,
           y * checkerSize - bgOffsetY,
@@ -509,6 +536,7 @@ function checkHits(attacker, defender) {
 
   const currentMD = attacker.getCurrentMoveData();
   if (!currentMD || !attacker.canHitThisSequence) return;
+  if (attacker._hasHitCurrentMoveData) return;
 
   const guardFlag = currentMD.guard_flag; // "High", "Mid", "Low"
 
@@ -702,7 +730,7 @@ class Stray extends Character {
     }
 
     this.advanceFrame("nmlAtk5RP");
-    const anim = this.anims.nmlAtk5LP;
+    const anim = this.anims.nmlAtk5RP;
     if (this.frameIndex >= anim.frames.length - 1) this.changeState("idle");
   }
 
