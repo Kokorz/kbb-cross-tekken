@@ -86,12 +86,12 @@ Due to usage of assets that won't become public property until the latest versio
     - Shoulder Tackle. [Tetsuzanko!](https://virtuafighter.com/commands/tetsuzank%C5%8D.23329/view)
   - [ ] Animation
   - [ ] Code
-- [ ] 66LP
+- [x] 66LP
   - [x] Concept
       - A dashing uppercut! 
-  - [ ] Animation
+  - [x] Animation
     - Exists already, needs to get imported!
-  - [ ] Code
+  - [x] Code
 - [ ] 2LP
   - [ ] Concept
       - zzz
@@ -219,9 +219,12 @@ Due to usage of assets that won't become public property until the latest versio
 - [ ] Character select
 - [ ] Makey Makey support
 - [ ] Damage Scaling
+  - In progress, Issue with takeHit/checkHits where attacks apply Twice.
 - [ ] Launch Scaling (aka, Tekken's Juggle System)
-- [ ] Add in the WALLS.
+  - In progress, Issue with takeHit/checkHits where attacks apply Twice.
+- [x] Add in the WALLS.
 - [ ] Add a proper background
+  - You know what, i'm NOT doing this!
 - [ ] Make UI more Stylish
 - [ ] Effects System
   - [x] Sound and Visual Effects Spawn/Play
